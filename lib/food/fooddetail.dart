@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:fypv1/user.dart';
 import 'package:http/http.dart' as http;
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:toast/toast.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:fypv1/food.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fypv1/tabscreen/cartpage.dart';
+import 'package:fypv1/main.dart';
+import 'dart:async';
 
 class FoodDetail extends StatefulWidget {
   final User user;
@@ -29,12 +32,12 @@ class _FoodDetailState extends State<FoodDetail> {
   double foodPrice = 0;
   int quantity = 0;
   String cartQuantity = "0";
-
+  String _foodid = "";
   @override
   void initState() {
     super.initState();
     // refreshKey = GlobalKey<RefreshIndicatorState>();
-    //  _loadData();
+      _loadData();
   }
 
   @override
@@ -56,6 +59,7 @@ class _FoodDetailState extends State<FoodDetail> {
                     Stack(
                       children: <Widget>[
                         Container(
+                          
                           child: CachedNetworkImage(
                             imageUrl: server + "/images/${widget.food.id}.jpg",
                             placeholder: (context, url) => Center(
@@ -86,169 +90,183 @@ class _FoodDetailState extends State<FoodDetail> {
                           right: 0.0,
                           left: 0.0,
                           child: AppBar(
+                            leading: IconButton(icon: Icon(Icons.arrow_back), onPressed: (){
+                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>MainScreen(user:widget.user)));
+                            }),
+                            iconTheme: IconThemeData(
+                              color: Colors.white,
+                              size: 25
+                            ),
                             centerTitle: true,
-                            title: Text(widget.food.name),
+                            title: Text(widget.food.name,style: TextStyle(fontSize: 25),maxLines: 3,),
                             backgroundColor: Colors.transparent,
                             elevation: 0.0,
                           ),
-                        )
+                        ),
                       ],
                     ),
-
-                    //SizedBox(height:10),
-                    Padding(
-                      padding: EdgeInsets.all(12.0),
+                     Padding(
+                      padding: EdgeInsets.all(0.0),
                       child: Column(
                         children: <Widget>[
-                          Column(
-                            children: [
-                              if (widget.food.rating == '1') ...[
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    Text(
-                                      'Review: ',
-                                      style: TextStyle(color: Colors.black87),
-                                    ),
-                                    Icon(Icons.star, color: Colors.amber),
-                                    Icon(Icons.star_border,
-                                        color: Colors.amber),
-                                    Icon(Icons.star_border,
-                                        color: Colors.amber),
-                                    Icon(Icons.star_border,
-                                        color: Colors.amber),
-                                    Icon(Icons.star_border,
-                                        color: Colors.amber),
-                                  ],
-                                ),
-                              ] else if (widget.food.rating == '2') ...[
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    Text(
-                                      'Review: ',
-                                      style: TextStyle(color: Colors.black87),
-                                    ),
-                                    Icon(Icons.star, color: Colors.amber),
-                                    Icon(Icons.star, color: Colors.amber),
-                                    Icon(Icons.star_border,
-                                        color: Colors.amber),
-                                    Icon(Icons.star_border,
-                                        color: Colors.amber),
-                                  ],
-                                ),
-                              ] else if (widget.food.rating == '3') ...[
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    Text(
-                                      'Review: ',
-                                      style: TextStyle(color: Colors.black87),
-                                    ),
-                                    Icon(Icons.star, color: Colors.amber),
-                                    Icon(Icons.star, color: Colors.amber),
-                                    Icon(Icons.star_border,
-                                        color: Colors.amber),
-                                    Icon(Icons.star_border,
-                                        color: Colors.amber),
-                                  ],
-                                ),
-                              ] else if (widget.food.rating == '4') ...[
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    Text(
-                                      'Review: ',
-                                      style: TextStyle(color: Colors.black87),
-                                    ),
-                                    Icon(Icons.star, color: Colors.amber),
-                                    Icon(Icons.star, color: Colors.amber),
-                                    Icon(Icons.star, color: Colors.amber),
-                                    Icon(Icons.star, color: Colors.amber),
-                                    Icon(
-                                      Icons.star_border,
-                                      color: Colors.amber,
-                                    )
-                                  ],
-                                ),
-                              ] else ...[
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    Text(
-                                      'Review: ',
-                                      style: TextStyle(color: Colors.black87),
-                                    ),
-                                    Icon(Icons.star, color: Colors.amber),
-                                    Icon(Icons.star, color: Colors.amber),
-                                    Icon(Icons.star, color: Colors.amber),
-                                    Icon(Icons.star, color: Colors.amber),
-                                    Icon(Icons.star, color: Colors.amber)
-                                  ],
-                                ),
-                              ]
-                            ],
-                          ),
-                          SizedBox(height: 8),
-                          Card(
-                            elevation: 10,
-                            child: Padding(
-                              padding: EdgeInsets.all(10),
-                              child: SingleChildScrollView(
-                                child: Column(
-                                  children: <Widget>[
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: <Widget>[
-                                        Row(
-                                          children: <Widget>[
-                                            Icon(
-                                              Icons.restaurant,
-                                              color: Colors.blueAccent,
-                                            ),
-                                            SizedBox(width: 5),
-                                            GestureDetector(
-                                              onTap: () {},
-                                              child: Text(
-                                                '${widget.food.shopname.toUpperCase()}',
-                                                style: TextStyle(
-                                                    color: Colors.blue[600],
-                                                    fontWeight:
-                                                        FontWeight.bold),
+                          
+                          Container(
+                            height: screenHeight/2,
+                            child: Card(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20)),
+                              elevation: 10,
+                              child: Padding(
+                                padding: EdgeInsets.all(10),
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    children: <Widget>[
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: <Widget>[
+                                          Row(
+                                            children: <Widget>[
+                                              SizedBox(width: 5),
+                                              GestureDetector(
+                                                onTap: () {},
+                                                child: Text(
+                                                  'FROM ${widget.food.shopname.toUpperCase()}',
+                                                  style: TextStyle(
+                                                      color: Colors.blueGrey,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                          fontSize: 18),
+                                                          
+                                                ),
                                               ),
-                                            ),
-                                            Icon(Icons.home, color: Colors.blue)
-                                          ],
-                                        ),
-                                        Text(
-                                          "at RM " +
-                                              "${foodPrice = 1.5 + double.parse(widget.food.price)}",
-                                          style: TextStyle(fontSize: 20),
-                                        )
-                                      ],
-                                    ),
-                                    SizedBox(height: 10),
-                                    Container(
-                                        alignment: Alignment.topLeft,
-                                        child: Text(
-                                            'Include: 1x' + widget.food.name,
-                                            style:
-                                                TextStyle(color: Colors.grey))),
-                                    SizedBox(height: 10),
-                                    Container(
-                                        alignment: Alignment.topLeft,
-                                        child: Text(
-                                            'Location: ' + widget.food.name,
-                                            style:
-                                                TextStyle(color: Colors.grey))),
-                                    SizedBox(height: 10),
-                                    Container(
-                                        alignment: Alignment.topLeft,
-                                        child: Text(
-                                            'Each Order Maximum Quantity: ' +
-                                                widget.food.quantity)),
-                                  ],
+                                              Icon(Icons.home, color: Colors.blueAccent)
+                                            ],
+                                          ),
+                                          Text(
+                                            "at RM " +
+                                                "${foodPrice = 1.5 + double.parse(widget.food.price)}",
+                                            style: TextStyle(fontSize: 20),
+                                          )
+                                        ],
+                                      ),
+                                      SizedBox(height: 20),
+                                      Divider(
+
+                                      ),
+                                      Column(
+                                        
+                                           children: [
+                                if (widget.food.rating == '1') ...[
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: <Widget>[
+                                      Text(
+                                        'Review: ',
+                                        style: TextStyle(color: Colors.black87),
+                                      ),
+                                      Icon(Icons.star, color: Colors.amber),
+                                      Icon(Icons.star_border,
+                                          color: Colors.amber),
+                                      Icon(Icons.star_border,
+                                          color: Colors.amber),
+                                      Icon(Icons.star_border,
+                                          color: Colors.amber),
+                                      Icon(Icons.star_border,
+                                          color: Colors.amber),
+                                    ],
+                                  ),
+                                ] else if (widget.food.rating == '2') ...[
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: <Widget>[
+                                      Text(
+                                        'Review: ',
+                                        style: TextStyle(color: Colors.black87),
+                                      ),
+                                      Icon(Icons.star, color: Colors.amber),
+                                      Icon(Icons.star, color: Colors.amber),
+                                      Icon(Icons.star_border,
+                                          color: Colors.amber),
+                                      Icon(Icons.star_border,
+                                          color: Colors.amber),
+                                    ],
+                                  ),
+                                ] else if (widget.food.rating == '3') ...[
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: <Widget>[
+                                      Text(
+                                        'Review: ',
+                                        style: TextStyle(color: Colors.black87),
+                                      ),
+                                      Icon(Icons.star, color: Colors.amber),
+                                      Icon(Icons.star, color: Colors.amber),
+                                      Icon(Icons.star_border,
+                                          color: Colors.amber),
+                                      Icon(Icons.star_border,
+                                          color: Colors.amber),
+                                    ],
+                                  ),
+                                ] else if (widget.food.rating == '4') ...[
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: <Widget>[
+                                      Text(
+                                        'Review: ',
+                                        style: TextStyle(
+                                            color: Colors.black87, fontSize: 20),
+                                      ),
+                                      Icon(Icons.star, color: Colors.amber),
+                                      Icon(Icons.star, color: Colors.amber),
+                                      Icon(Icons.star, color: Colors.amber),
+                                      Icon(Icons.star, color: Colors.amber),
+                                      Icon(
+                                        Icons.star_border,
+                                        color: Colors.amber,
+                                      )
+                                    ],
+                                  ),
+                                ] else ...[
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: <Widget>[
+                                      Text(
+                                        'Review: ',
+                                        style: TextStyle(color: Colors.black87),
+                                      ),
+                                      Icon(Icons.star, color: Colors.amber),
+                                      Icon(Icons.star, color: Colors.amber),
+                                      Icon(Icons.star, color: Colors.amber),
+                                      Icon(Icons.star, color: Colors.amber),
+                                      Icon(Icons.star, color: Colors.amber)
+                                    ],
+                                  ),
+                                ]
+                              ],
+                                      ),
+                                      SizedBox(height: 10,),
+                                      Container(
+                                          alignment: Alignment.topLeft,
+                                          child: Text(
+                                              'Include: 1x' + widget.food.name,
+                                              style:
+                                                  TextStyle(color: Colors.grey))),
+                                      SizedBox(height: 10),
+                                      Container(
+                                          alignment: Alignment.topLeft,
+                                          child: Text(
+                                              'Location: ' + widget.food.name,
+                                              style:
+                                                  TextStyle(color: Colors.grey))),
+                                      SizedBox(height: 10),
+                                      Container(
+                                          alignment: Alignment.topLeft,
+                                          child: Text(
+                                              'Each Order Maximum Quantity: ' +
+                                                  widget.food.quantity)),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -256,6 +274,7 @@ class _FoodDetailState extends State<FoodDetail> {
                         ],
                       ),
                     ),
+                   
                   ],
                 ),
               ),
@@ -264,6 +283,7 @@ class _FoodDetailState extends State<FoodDetail> {
               padding: const EdgeInsets.fromLTRB(10, 0, 10, 30),
               child: Container(
                 decoration: BoxDecoration(
+                  
                   shape: BoxShape.rectangle,
                 ),
                 alignment: Alignment.center,
@@ -308,6 +328,9 @@ class _FoodDetailState extends State<FoodDetail> {
                         SizedBox(width: 20),
                         Expanded(
                           child: MaterialButton(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)
+                            ),
                             height: screenHeight / 12,
                             minWidth: screenWidth / 1.8,
                             onPressed: () {
@@ -315,12 +338,18 @@ class _FoodDetailState extends State<FoodDetail> {
                             },
                             color:
                                 quantity == 0 ? Colors.grey : Colors.lightBlue,
-                            child: Text(
-                              'ADD TO CART',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: <Widget>[
+                                Icon(Icons.shopping_basket,color: Colors.white,),
+                                Text(
+                                  'ADD TO CART',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20),
+                                ),
+                              ],
                             ),
                           ),
                         )
@@ -356,7 +385,11 @@ class _FoodDetailState extends State<FoodDetail> {
     });
   }
 
-  void _addCart(int q) {
+  void _addCart(int q) async {
+    int _curstore = 0;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setInt("cquantity", 0);
+    _foodid = (prefs.getString("foodid"));
     if (widget.user.email == "unregister@hewdeliver.com") {
       Toast.show("Please Register/Login.", context,
           duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
@@ -374,6 +407,7 @@ class _FoodDetailState extends State<FoodDetail> {
           "email": widget.user.email,
           "foodid": widget.food.id,
           "quantity": q.toString(),
+          "fquantity": widget.food.quantity
         }).then((res) {
           print(res.body);
           if (res.body == "failed") {
@@ -383,36 +417,41 @@ class _FoodDetailState extends State<FoodDetail> {
               pr.hide().whenComplete(() {
                 print(pr.isShowing());
               });
+
+              _clearCartDialog(_foodid);
             });
             return;
           } else {
             List respond = res.body.split(",");
-            setState(() {
+            setState(() async {
               cartQuantity = respond[1];
-              widget.user.quantity = cartQuantity;
+              _curstore = int.parse(cartQuantity) + _curstore;
+              _curstore = (prefs.getInt("cquantity")) + _curstore;
+              await prefs.setInt("cquantity", _curstore);
+              widget.user.quantity = _curstore.toString();
+              await prefs.setString("foodid", widget.food.id);
               quantity = 0;
               final snackBar = SnackBar(
-              duration: Duration(seconds:2),
-              content: Text('Added Successfully!'),
-              action: SnackBarAction(label: 'Manage Cart', onPressed: () {
-                
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>CartPage(user:widget.user)));
-              }),
-              
-            );
-             globalKey.currentState.showSnackBar(snackBar);
+                duration: Duration(seconds: 2),
+                content: Text('Added Successfully!'),
+                action: SnackBarAction(
+                    label: 'Manage Cart',
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  MainScreen(user: widget.user)));
+                    }),
+              );
+              globalKey.currentState.showSnackBar(snackBar);
             });
-            
           }
           Future.delayed(Duration(seconds: 1)).then((value) {
             pr.hide().whenComplete(() {
               print(pr.isShowing());
             });
           });
-
-          
-
-           
         }).catchError((err) {
           print(err);
           Future.delayed(Duration(seconds: 2)).then((value) {
@@ -437,6 +476,84 @@ class _FoodDetailState extends State<FoodDetail> {
     } catch (e) {
       Toast.show("Failed add to cart", context,
           duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+    }
+  }
+
+  void _clearCartDialog(String _foodid) {
+    if ((int.parse(widget.user.quantity)+quantity >= int.parse(widget.food.quantity)) &&
+        (_foodid == widget.food.id)) {
+      showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(20.0),
+                  ),
+                ),
+                title: new Text("The order quantity is excessive"),
+                actions: <Widget>[
+                  MaterialButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(false);
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => CartPage(
+                                    user: widget.user,
+                                  )));
+                    },
+                    child: Text('Manage your Cart'),
+                  ),
+                  MaterialButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(false);
+                    },
+                    child: Text('No'),
+                  )
+                ],
+              ));
+    } else {
+      showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(20.0))),
+                title: new Text(
+                    'Add this food will delete your current food in cart'),
+                actions: <Widget>[
+                  MaterialButton(
+                    onPressed: () async {
+                      SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
+
+                      Navigator.of(context).pop(false);
+                      http.post(server + "/php/delete_cart.php", body: {
+                        "email": widget.user.email,
+                      }).then((res) {
+                        print(res.body);
+
+                        if (res.body == "success") {
+                          _addCart(quantity);
+                          prefs.setInt("cquantity", 0);
+                        } else {
+                          Toast.show("Failed to proceed", context,
+                              duration: Toast.LENGTH_LONG,
+                              gravity: Toast.BOTTOM);
+                        }
+                      }).catchError((err) {
+                        print(err);
+                      });
+                    },
+                    child: Text('Proceed'),
+                  ),
+                  MaterialButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(false);
+                    },
+                    child: Text('No'),
+                  )
+                ],
+              ));
     }
   }
 }

@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'login.dart';
+import 'main.dart';
+import 'user.dart';
+import 'package:http/http.dart' as http;
+
+String _email, _pw;
+String server = "http://lawlietaini.com/hewdeliver";
 
 void main() =>runApp(
   MaterialApp(
@@ -54,7 +61,8 @@ class _ProgressIndicatorState extends State<ProgressIndicator>
       animation = Tween(begin:0.0, end: 1.0).animate(controller)..addListener(() {
         setState(() {
           if(animation.value>0.99) {
-            Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=>LoginScreen()));
+          _loadpref(this.context);
+        // Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=>LoginScreen()));
           }
         });
       });
@@ -78,4 +86,81 @@ child: new CircularProgressIndicator(
 ),
     );
   }
+
+  void _loadpref(BuildContext ctx)async{
+    print('Inside loadpref');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _email = (prefs.getString('email'));
+    _pw = (prefs.getString('pass'));
+    print("Splash:Preference");
+    print(_email);
+    print(_pw);
+    if(_isEmailValid(_email)){
+          _onLogin(_email, _pw, ctx);
+                  
+    }
+                
+                else{
+                  User user = new User(
+                    name: "unregistered",
+                    email: "user@noregisterwaklingdeliver.com",
+                    phone: "unregistered",
+                    type: "unregistered",
+                    credit: "unregistered",
+                    address: "unregistered",
+                    datereg: "unregistered",
+                    quantity: "0"
+                  );
+                  Navigator.pushReplacement(ctx, MaterialPageRoute(builder:(context)=>MainScreen(user:user)));
+          
+                }}
+              
+                bool _isEmailValid(String email) {
+                  return RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(email);
+                }
+          
+            void _onLogin(String email, String pw, BuildContext ctx) {
+                http.post(server+"/php/get_user.php",body: {
+                  "email" :_email,
+                  "password" : _pw,
+
+                }).then((res){
+                  print(res.statusCode);
+                  var extraction = res.body;
+                  List extract = extraction.split(",");
+                  print("SplashScreen:Loading");
+
+                  if(extract[0]=="success"){
+                    User user = new User (
+                      name: extract[1],
+                      email: extract[2],
+                      phone: extract[3],
+                      type: extract[4],
+                      credit: extract[5],
+                      datereg: extract[6],
+                      quantity: "0"
+                    );
+                    Navigator.pushReplacement(ctx, MaterialPageRoute(builder: (context)=>MainScreen(user: user,)));
+
+                  }else{
+                    //allow user login as unregister user
+                    print("no register");
+                     User user = new User(
+                    name: "unregistered",
+                    email: "user@noregisterwaklingdeliver.com",
+                    phone: "unregistered",
+                    type: "unregistered",
+                    credit: "unregistered",
+                    address: "unregistered",
+                    datereg: "unregistered",
+                    quantity: "0"
+                  );
+
+                  }
+                }).catchError((err){
+                  print(err);
+                });
+                
+              
+            }
 }

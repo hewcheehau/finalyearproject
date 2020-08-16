@@ -13,9 +13,10 @@ import 'package:async/async.dart';
 String pathAsset = 'asset/images/profile.jpg';
 String urlUpload = 'http://lawlietaini.com/hewdeliver/php/register1.php';
 File _image;
-File file = File(_image.path);
-
+File file;
 final _picker = ImagePicker();
+
+
 final TextEditingController _namecontroller = TextEditingController();
 final TextEditingController _emcontroller = TextEditingController();
 final TextEditingController _pwcontroller = TextEditingController();
@@ -33,6 +34,9 @@ class RegisterBuyer extends StatefulWidget {
 }
 
 class _RegisterBuyerState extends State<RegisterBuyer> {
+
+
+
   @override
   void initState() {
     super.initState();
@@ -98,7 +102,8 @@ class RegisterWidget extends StatefulWidget {
 class _RegisterWidgetState extends State<RegisterWidget> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _autoValidate = false;
-
+  String server = "http://lawlietaini.com/hewdeliver";
+    
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -127,7 +132,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                 child: new FloatingActionButton(
                   child: const Icon(Icons.camera_alt),
                   backgroundColor: Colors.black54,
-                  onPressed: _choose,
+                  onPressed: _takePicture,
                 ))
           ],
         ),
@@ -256,24 +261,26 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                   leading: Icon(Icons.camera_alt),
                   title: Text('Camera'),
                   onTap: () async {
-                    _image = await ImagePicker.pickImage(
+                    PickedFile _image = await _picker.getImage(
                       source: ImageSource.camera,
-                      imageQuality: 80,
-                      maxHeight: 450,
-                      maxWidth: double.infinity,
+                      maxHeight: 400,
+                      maxWidth: 300,
+                      imageQuality: 70
                     );
+
                     setState(() {
                       Navigator.pop(context);
+                      
                     });
                     ListTile(
                       leading: Icon(Icons.photo_album),
                       title: Text('Gallery'),
                       onTap: () async {
-                        _image = await ImagePicker.pickImage(
+                      /*  _image = await ImagePicker.pickImage(
                             source: ImageSource.gallery,
                             imageQuality: 80,
                             maxHeight: 450,
-                            maxWidth: double.infinity);
+                            maxWidth: double.infinity);*/
                         setState(() {
                           Navigator.pop(context);
                         });
@@ -309,7 +316,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
 
       print('123');
       file = File(_image.path);
-      String base64Image = base64Encode(_image.readAsBytesSync());
+      String base64Image = base64Encode(file.readAsBytesSync());
       http.post(urlUpload, body: {
         "encoded_string": base64Image,
         "name": _name,
@@ -406,4 +413,67 @@ class _RegisterWidgetState extends State<RegisterWidget> {
           );
         });
   }
+  void _takePicture() async {
+    print('enter take picture');
+   
+
+    showModalBottomSheet(
+        context: context,
+        builder: (builder) {
+          return Container(
+            padding: EdgeInsets.all(10),
+            child: Wrap(
+              children: <Widget>[
+               
+               
+                ListTile(
+                  leading: Icon(
+                    Icons.camera_front,
+                    color: Colors.blue[600],
+                  ),
+                  title: Text('Take Photo'),
+                  onTap: () async {
+                    
+                    PickedFile _image = await _picker.getImage(
+                      source: ImageSource.camera,
+                      maxHeight: 400,
+                      maxWidth: 300,
+                      imageQuality: 70,
+                    );
+                        setState(() {
+                          file = File(_image.path);
+                          
+                          Navigator.of(context).pop(false);
+                          
+                        });
+                  
+                  },
+                ),
+                Divider(
+                  thickness: 0,
+                  color: Colors.grey[400],
+                  indent: 0,
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.photo_album,
+                    color: Colors.blue[600],
+                  ),
+                  title: Text('Gallery'),
+                  onTap: () async {
+                    
+                    PickedFile _image = await _picker.getImage(
+                      source: ImageSource.gallery,
+                      maxHeight: 400,
+                      maxWidth: 300,
+                      imageQuality: 70,
+                    );
+                    
+                   
+                  },
+                )
+              ],
+            ),
+          );
+        });}
 }

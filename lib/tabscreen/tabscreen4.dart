@@ -85,7 +85,7 @@ class _TabScreen4State extends State<TabScreen4> {
                         child: CachedNetworkImage(
                           fit: BoxFit.cover,
                           imageUrl:
-                              server + "/profile/${widget.user.email}.jpg?" ??
+                              server + "/profile/${widget.user.email}.jpg" ??
                                   server + "/profile/default.jpg?",
                           imageBuilder: (context, imageProvider) => Container(
                             decoration: BoxDecoration(

@@ -7,12 +7,15 @@ import 'package:fypv1/user.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:progress_dialog/progress_dialog.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 import 'package:fypv1/food.dart';
 import 'package:fypv1/food/fooddetail.dart';
+import 'cartpage.dart';
+import 'package:badges/badges.dart';
+
 
 class MainPage extends StatefulWidget {
   final User user;
@@ -25,7 +28,7 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   GlobalKey<RefreshIndicatorState> refreshKey;
-
+  List itemCart;
   List itemdata;
   int current = 1;
   double screenHeight, screenWidth;
@@ -38,12 +41,16 @@ class _MainPageState extends State<MainPage> {
   double priceFood = 1;
   String titlecenter = "Loading available foods...";
   String server = "http://lawlietaini.com/hewdeliver";
+  String dropdown = "Recent";
+  int _quantityc = 0;
 
   @override
   void initState() {
     super.initState();
     refreshKey = GlobalKey<RefreshIndicatorState>();
     _loadDate();
+    _loadCart();
+    init();
 
     if (widget.user.type == 'Food Provider') {
       _isFoodprovider = true;
@@ -53,8 +60,6 @@ class _MainPageState extends State<MainPage> {
     }
   }
 
-  
-
   @override
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
@@ -63,30 +68,46 @@ class _MainPageState extends State<MainPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Today food',
-          style: TextStyle(color: Colors.black87),
+        title: Row(
+          children: <Widget>[
+            Text(
+          'Today',
+          style: TextStyle(color: Colors.black87,fontSize: 25),
         ),
+         Text(
+          'F',
+          style: TextStyle(color: Colors.blueAccent,fontSize: 25),
+        ),
+        Icon(Icons.fastfood,color:Colors.blueAccent,size:30),
+        Text(
+          'd',
+          style: TextStyle(color: Colors.blueAccent,fontSize: 25),
+        ),
+        
+          ],
+        ),
+        
         backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
         actions: <Widget>[
-          /*  IconButton(
-            icon: _visible
-                ? new Icon(Icons.expand_more)
-                : new Icon(Icons.expand_less),
-            onPressed: () {
-              setState(() {
-                if (_visible) {
-                  _visible = false;
-                } else {
-                  _visible = true;
-                }
-              });
-            },
-          )*/
-          IconButton(
-              icon: Icon(Icons.notifications, color: Colors.black),
-              onPressed: null)
+          Container(
+            padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
+            child: IconButton(icon: 
+            Badge(
+              alignment: Alignment.topRight,
+              showBadge: true,
+              badgeContent: Text(widget.user.quantity??Text('0'),style:TextStyle(color: Colors.white,fontWeight: FontWeight.bold)),
+                        child: Icon(MdiIcons.cartOutline,
+              color: Colors.blueAccent,
+              size: 30,
+              
+              ),
+            ), onPressed: (){
+               Navigator.push(context, MaterialPageRoute(builder: (context)=>CartPage(user:widget.user)));
+            }),
+          )
+      
+         
         ],
       ),
       body: SafeArea(
@@ -112,26 +133,45 @@ class _MainPageState extends State<MainPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: <Widget>[
                           Flexible(
+                            flex: 10,
                             child: Container(
-                              height: 30,
+                              decoration: BoxDecoration(
+                              
+                                  borderRadius: BorderRadius.circular(5.0),
+                                  shape: BoxShape.rectangle,
+                                  border:
+                                      Border.all(color: Colors.transparent)),
                               child: TextField(
+                                textInputAction: TextInputAction.go,
                                 style: TextStyle(color: Colors.black),
+                                textAlign: TextAlign.left,
                                 autofocus: false,
+                                onSubmitted: (_foodController) {
+                                  _sortFoodbyName(_foodController.toString());
+                                },
                                 controller: _foodController,
                                 decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  hintText: 'Search Food...',
+                                  contentPadding:
+                                      EdgeInsets.fromLTRB(5, 10, 5, 10),
                                   icon: Icon(
                                     Icons.search,
-                                    color: Colors.lightBlue,
+                                    color: Colors.blueAccent,
                                   ),
-                                  border: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color: Colors.lightBlue[600]),
-                                      borderRadius: BorderRadius.circular(8.0)),
                                 ),
                               ),
                             ),
                           ),
                           Flexible(
+                            child: IconButton(
+                              color: Colors.blueAccent,
+                              icon: Icon(Icons.keyboard_arrow_right),
+                              onPressed: () =>
+                                  {_sortFoodbyName(_foodController.text)},
+                            ),
+                          )
+                          /*  Flexible(
                             child: MaterialButton(
                               color: Colors.white,
                               shape: RoundedRectangleBorder(
@@ -145,16 +185,17 @@ class _MainPageState extends State<MainPage> {
                                   style:
                                       TextStyle(color: Colors.lightBlue[600])),
                             ),
-                          )
+                          )*/
                         ],
                       ),
                     ),
                   ),
                 ),
                 Visibility(
-                  visible: _visible,
+                  visible: true,
                   child: Card(
-                    elevation: 10,
+                    elevation: 5,
+                    color: Colors.white,
                     child: Padding(
                       padding: EdgeInsets.all(5),
                       child: SingleChildScrollView(
@@ -165,19 +206,75 @@ class _MainPageState extends State<MainPage> {
                               children: <Widget>[
                                 FlatButton(
                                     onPressed: () => _sortFood("Recent"),
-                                    color: Colors.pinkAccent,
+                                    
                                     child: Column(
                                       children: <Widget>[
                                         Icon(
-                                          MdiIcons.update,
-                                          color: Colors.black87,
+                                          Icons.notifications_active,
+                                          color: Colors.blue[300],
+                                          size: 35,
                                         ),
-                                        Text(
+                                      /*  Text(
                                           'Recent',
                                           style: TextStyle(color: Colors.black),
-                                        )
+                                        )*/
                                       ],
-                                    ))
+                                    )),
+                              ],
+                            ),
+                            
+                            SizedBox(width: 3),
+                            Column(
+                              children: <Widget>[
+                                FlatButton(
+                                    onPressed: () => _sortFood("Popular"),
+                                    
+                                    child: Column(
+                                      children: <Widget>[
+                                        Icon(
+                                          Icons.favorite,
+                                          color: Colors.blue[300],
+                                          size: 35,
+                                        ),
+                                       
+                                      ],
+                                    )),
+                              ],
+                            ),
+                            SizedBox(width: 3),
+                            Column(
+                              children: <Widget>[
+                                FlatButton(
+                                    onPressed: () => _sortFood("Recent"),
+                                    
+                                    child: Column(
+                                      children: <Widget>[
+                                        Icon(
+                                          Icons.restaurant_menu,
+                                          color: Colors.blue[300],
+                                          size: 35,
+                                        ),
+                                       
+                                      ],
+                                    )),
+                              ],
+                            ),
+                            SizedBox(width: 3),
+                            Column(
+                              children: <Widget>[
+                                FlatButton(
+                                    onPressed: () => _sortFood("Recent"),
+                                    
+                                    child: Column(
+                                      children: <Widget>[
+                                        Icon(
+                                          Icons.history,
+                                          color: Colors.blue[300],
+                                          size: 35,
+                                        ),
+                                        
+                                      ],
+                                    )),
                               ],
                             ),
                             SizedBox(width: 3),
@@ -185,24 +282,57 @@ class _MainPageState extends State<MainPage> {
                               children: <Widget>[
                                 FlatButton(
                                     onPressed: () => _sortFood("Popular"),
-                                    color: Colors.blueAccent,
+                                    
                                     child: Column(
                                       children: <Widget>[
                                         Icon(MdiIcons.food),
                                         Text('Popular')
                                       ],
                                     )),
+                                    
+
                               ],
-                            )
+                            ),
+                            
                           ],
                         ),
                       ),
                     ),
                   ),
                 ),
-                Text(
-                  curItem,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      Expanded(
+                          child: Column(
+                        children: <Widget>[
+                          Divider(
+                            color: Colors.blueGrey,
+                          ),
+                        ],
+                      )),
+                      Container(
+                        padding: EdgeInsets.only(left:15,right:15),
+                        child: Text(
+                          curItem,
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blueGrey),
+                        ),
+                      ),
+                       Expanded(
+                          child: Column(
+                        children: <Widget>[
+                          Divider(
+                            color: Colors.blueGrey,
+                          ),
+                        ],
+                      )),
+                    ],
+                  ),
                 ),
                 itemdata == null
                     ? Flexible(
@@ -210,21 +340,24 @@ class _MainPageState extends State<MainPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
                             FlatButton(
-                              onPressed: (){
-                                ProgressDialog pr = new ProgressDialog(context,isDismissible: true);
-                                pr.style(message: "Loading");
-                                pr.show();
-                                _loadDate();
-                                Future.delayed(Duration(seconds: 2)).then((value){
+                                onPressed: () {
+                                  ProgressDialog pr = new ProgressDialog(
+                                      context,
+                                      isDismissible: true);
+                                  pr.style(message: "Loading");
+                                  pr.show();
+                                  _loadDate();
+                                  Future.delayed(Duration(seconds: 2))
+                                      .then((value) {
                                     pr.hide().whenComplete(() {
-                                        print(pr.isShowing());
-                                        
+                                      print(pr.isShowing());
                                     });
-                                });
-                                
-                               
-                              },
-                              child: Icon(MdiIcons.reload,color: Colors.grey,)),
+                                  });
+                                },
+                                child: Icon(
+                                  MdiIcons.reload,
+                                  color: Colors.grey,
+                                )),
                             Container(
                               child: Center(
                                 child: Text(titlecenter,
@@ -235,25 +368,29 @@ class _MainPageState extends State<MainPage> {
                                         fontWeight: FontWeight.w700)),
                               ),
                             ),
-                            
                           ],
                         ),
                       )
                     : Expanded(
                         child: GridView.count(
+                          mainAxisSpacing: 10,
                           crossAxisCount: 1,
-                          childAspectRatio: (screenWidth / screenHeight) / 0.35,
+                          childAspectRatio: (screenWidth / screenHeight) / 0.37,
                           children: List.generate(itemdata.length, (index) {
                             return Container(
                               decoration:
                                   BoxDecoration(shape: BoxShape.rectangle),
                               child: Card(
-                                elevation: 8,
+                                elevation: 5,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadiusDirectional.circular(15)
+                                ),
                                 child: Padding(
                                     padding: EdgeInsets.all(5),
                                     child: Column(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                       children: <Widget>[
                                         GestureDetector(
                                           onTap: () => _onFoodDetail(
@@ -298,20 +435,25 @@ class _MainPageState extends State<MainPage> {
                                             ),
                                           ),
                                         ),
+                                      Text(
+                                              itemdata[index]['foodname'],
+                                              maxLines: 1,
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 20,
+                                                  letterSpacing: 0.3),
+                                            
+                                          
+                                       ),
+                                       SizedBox(height: 5),
                                         Text(
-                                          itemdata[index]['foodname'],
-                                          maxLines: 1,
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 15),
-                                        ),
-                                        Text(
-                                          "Shop: " +
+                                          "From " +
                                               itemdata[index]['foodshop'],
                                           maxLines: 1,
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold,
-                                              fontSize: 15),
+                                              fontSize: 15,
+                                              color: Colors.grey[700]),
                                         ),
                                         itemdata[index]['foodrating'] == '0'
                                             ? Row(
@@ -339,6 +481,7 @@ class _MainPageState extends State<MainPage> {
                                                       children: <Widget>[
                                                         Row(
                                                           children: <Widget>[
+                                                            Icon(Icons.attach_money),
                                                             Text("RM ",
                                                                 style: TextStyle(
                                                                     fontWeight:
@@ -358,117 +501,7 @@ class _MainPageState extends State<MainPage> {
                                                     ),
                                                   ),
                                                 ],
-                                              )
-                                        /*    Column(
-                                                                                    children: [
-                                                                                      if (itemdata[index]['foodrating'] ==
-                                                                                          '1') ...[
-                                                                                        Row(
-                                                                                          children: <Widget>[
-                                                                                            Text(
-                                                                                              'Review',
-                                                                                              style: TextStyle(
-                                                                                                  color: Colors.black87),
-                                                                                            ),
-                                                                                            Icon(Icons.star,
-                                                                                                color: Colors.amber),
-                                                                                            Icon(Icons.star_border,
-                                                                                                color: Colors.amber),
-                                                                                            Icon(Icons.star_border,
-                                                                                                color: Colors.amber),
-                                                                                            Icon(Icons.star_border,
-                                                                                                color: Colors.amber),
-                                                                                            Icon(Icons.star_border,
-                                                                                                color: Colors.amber),
-                                                                                          ],
-                                                                                        ),
-                                                                                      ] else if (itemdata[index]
-                                                                                              ['foodrating'] ==
-                                                                                          '2') ...[
-                                                                                        Row(
-                                                                                          children: <Widget>[
-                                                                                            Text(
-                                                                                              'Review',
-                                                                                              style: TextStyle(
-                                                                                                  color: Colors.black87),
-                                                                                            ),
-                                                                                            Icon(Icons.star,
-                                                                                                color: Colors.amber),
-                                                                                            Icon(Icons.star,
-                                                                                                color: Colors.amber),
-                                                                                            Icon(Icons.star_border,
-                                                                                                color: Colors.amber),
-                                                                                            Icon(Icons.star_border,
-                                                                                                color: Colors.amber),
-                                                                                          ],
-                                                                                        ),
-                                                                                      ] else if (itemdata[index]
-                                                                                              ['foodrating'] ==
-                                                                                          '3') ...[
-                                                                                        Row(
-                                                                                          children: <Widget>[
-                                                                                            Text(
-                                                                                              'Review',
-                                                                                              style: TextStyle(
-                                                                                                  color: Colors.black87),
-                                                                                            ),
-                                                                                            Icon(Icons.star,
-                                                                                                color: Colors.amber),
-                                                                                            Icon(Icons.star,
-                                                                                                color: Colors.amber),
-                                                                                            Icon(Icons.star_border,
-                                                                                                color: Colors.amber),
-                                                                                            Icon(Icons.star_border,
-                                                                                                color: Colors.amber),
-                                                                                          ],
-                                                                                        ),
-                                                                                      ] else if (itemdata[index]
-                                                                                              ['foodrating'] ==
-                                                                                          '4') ...[
-                                                                                        Row(
-                                                                                          children: <Widget>[
-                                                                                            Text(
-                                                                                              'Review',
-                                                                                              style: TextStyle(
-                                                                                                  color: Colors.black87),
-                                                                                            ),
-                                                                                            Icon(Icons.star,
-                                                                                                color: Colors.amber),
-                                                                                            Icon(Icons.star,
-                                                                                                color: Colors.amber),
-                                                                                            Icon(Icons.star,
-                                                                                                color: Colors.amber),
-                                                                                            Icon(Icons.star,
-                                                                                                color: Colors.amber),
-                                                                                            Icon(
-                                                                                              Icons.star_border,
-                                                                                              color: Colors.amber,
-                                                                                            )
-                                                                                          ],
-                                                                                        ),
-                                                                                      ] else ...[
-                                                                                        Row(
-                                                                                          children: <Widget>[
-                                                                                            Text(
-                                                                                              'Review',
-                                                                                              style: TextStyle(
-                                                                                                  color: Colors.black87),
-                                                                                            ),
-                                                                                            Icon(Icons.star,
-                                                                                                color: Colors.amber),
-                                                                                            Icon(Icons.star,
-                                                                                                color: Colors.amber),
-                                                                                            Icon(Icons.star,
-                                                                                                color: Colors.amber),
-                                                                                            Icon(Icons.star,
-                                                                                                color: Colors.amber),
-                                                                                            Icon(Icons.star,
-                                                                                                color: Colors.amber)
-                                                                                          ],
-                                                                                        ),
-                                                                                      ]
-                                                                                    ],
-                                                                                  )*/
+                                              ),
                                       ],
                                     )),
                               ),
@@ -481,6 +514,18 @@ class _MainPageState extends State<MainPage> {
           ),
         ),
       ),
+   /*   floatingActionButton: FloatingActionButton.extended(
+        onPressed: () async {
+          Navigator.push(context, MaterialPageRoute(builder: (context)=>CartPage(user:widget.user)));
+        },
+        label: Text(
+              widget.user.quantity,
+              style: TextStyle(fontSize: 15, color: Colors.white),
+            ) ??
+            Text("0"),
+        icon: Icon(MdiIcons.cart),
+        backgroundColor: Colors.blueAccent,
+      ),*/
     );
   }
 
@@ -516,7 +561,6 @@ class _MainPageState extends State<MainPage> {
         setState(() {
           var extractdata = json.decode(res.body);
           itemdata = extractdata["food"];
-          
         });
       }
     }).catchError((err) {
@@ -524,7 +568,44 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
-  _sortFood(String s) {}
+  _sortFood(String type) {
+    try {
+      ProgressDialog pr = new ProgressDialog(context,
+          isDismissible: true, type: ProgressDialogType.Normal);
+      pr.style(message: "Loading...");
+      pr.show();
+      String urlLoadFood = server + "/php/load_food.php";
+      http.post(urlLoadFood, body: {
+        "type": type,
+      }).then((res) {
+        if (res.body == "nodata") {
+          setState(() {
+            itemdata = null;
+            curItem = type;
+            titlecenter = "No food found.";
+          });
+          Future.delayed(Duration(seconds: 2)).then((value) {
+            pr.hide().whenComplete(() {
+              print(pr.isShowing());
+            });
+          });
+        } else {
+          setState(() {
+            curItem = type;
+            var extraction = json.decode(res.body);
+            itemdata = extraction["food"];
+            FocusScope.of(context).requestFocus(new FocusNode());
+            Future.delayed(Duration(seconds: 2)).then((value) {
+              pr.hide().whenComplete(() {});
+            });
+          });
+        }
+      });
+    } catch (e) {
+      Toast.show("error", context,
+          duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+    }
+  }
 
   _sortFoodbyName(String foodname) {
     try {
@@ -550,11 +631,10 @@ class _MainPageState extends State<MainPage> {
                 curItem = "Result:Search for" + "'" + foodname + "'";
                 itemdata = null;
                 Future.delayed(Duration(seconds: 1)).then((value) {
-                    pr.hide().whenComplete(() {
-                      print(pr.isShowing());
-                    });
+                  pr.hide().whenComplete(() {
+                    print(pr.isShowing());
+                  });
                 });
-                
               });
               FocusScope.of(context).requestFocus(new FocusNode());
               return;
@@ -593,7 +673,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   _onFoodDetail(itemdata, itemdata2, itemdata3, itemdata4, itemdata5, itemdata6,
-      itemdata7,itemdata8) {
+      itemdata7, itemdata8) {
     Food food = new Food(
         id: itemdata,
         name: itemdata2,
@@ -611,5 +691,37 @@ class _MainPageState extends State<MainPage> {
                   food: food,
                 )));
   }
-}
 
+  Future init() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+  }
+
+  void _loadCart() async {
+    String urlLoadCart = server + "/php/load_cart.php";
+    http.post(urlLoadCart, body: {
+      "email": widget.user.email,
+    }).then((res) {
+      print(res.body);
+
+      if (res.body == "Cart Empty") {
+        widget.user.quantity = "0";
+
+        return;
+      }
+
+      setState(() {
+        var extractdata = json.decode(res.body);
+        itemCart = extractdata["cart"];
+        for (int i = 0; i < itemCart.length; i++) {
+          _quantityc = int.parse(itemCart[i]['cquantity']) + _quantityc;
+        }
+        widget.user.quantity = _quantityc.toString();
+
+        //_amountPayable = _totalPrice + double.parse(_deliveryCharge);
+        return;
+      });
+    }).catchError((err) {
+      print(err);
+    });
+  }
+}
