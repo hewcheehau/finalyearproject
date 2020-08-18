@@ -1,34 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:fypv1/login.dart';
+import 'package:fypv1/splashscreen.dart';
 import 'package:fypv1/user.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fypv1/configsize.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:material_design_icons_flutter/icon_map.dart';
+import 'profiledetail.dart';
 
 final _picker = ImagePicker();
 
-class TabScreen4 extends StatefulWidget {
+class ProfileScreen extends StatefulWidget {
   final User user;
 
-  const TabScreen4({Key key, this.user}) : super(key: key);
+  const ProfileScreen({Key key, this.user}) : super(key: key);
 
   @override
-  _TabScreen4State createState() => _TabScreen4State();
+  _ProfileScreenState createState() => _ProfileScreenState();
 }
 
-class _TabScreen4State extends State<TabScreen4> {
+class _ProfileScreenState extends State<ProfileScreen> {
   String server = "http://lawlietaini.com/hewdeliver";
   double screenHeight, screenWidth;
   final f = new DateFormat('dd-MM-yyyy hh:mm a');
-  var parsedDate;
+  final f2 = new DateFormat('dd-MM-yyyy');
+  DateTime now = DateTime.now();
 
+  var parsedDate;
+  bool _dateShow = true;
   @override
   void initState() {
     super.initState();
@@ -39,7 +47,11 @@ class _TabScreen4State extends State<TabScreen4> {
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
-    parsedDate = DateTime.parse(widget.user.datereg);
+    if (widget.user.name == "unregistered") {
+      _dateShow = false;
+    }else{
+   parsedDate = DateTime.parse(widget.user.datereg);
+    }
     return Scaffold(
       backgroundColor: Color(0xffF8F8FA),
       body: Stack(overflow: Overflow.visible, children: <Widget>[
@@ -50,27 +62,38 @@ class _TabScreen4State extends State<TabScreen4> {
             Color(0xFF1976D2),
             Color(0xFF42A5F5),
           ])),
-          height: screenHeight / 2.3,
+          height: screenHeight / 1.7,
         ),
         Center(
           child: Column(
             children: <Widget>[
               SizedBox(height: 30),
-              Container(
-                padding: EdgeInsets.all(15),
-                alignment: Alignment.centerLeft,
-                child: Text('Profile',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: 30,
-                        fontFamily: 'Rock Salt',
-                        letterSpacing: 1.5)),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.all(12.0),
+                    alignment: Alignment.centerLeft,
+                    child: Text('Profile',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: 30,
+                            fontFamily: 'Rock Salt',
+                            letterSpacing: 1.5)),
+                  ),
+                  Container(
+                      padding: EdgeInsets.all(12.0),
+                      child: Text(
+                        widget.user.type,
+                        style: TextStyle(color: Colors.grey[350], fontSize: 25),
+                      ))
+                ],
               ),
-              SizedBox(height: 8),
               Padding(
                 padding: EdgeInsets.only(left: 15),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     GestureDetector(
                       onTap: _takePicture,
@@ -108,7 +131,7 @@ class _TabScreen4State extends State<TabScreen4> {
                       ),
                     ),
                     SizedBox(width: 12),
-                    Expanded(
+                    /*   Expanded(
                       child: Container(
                         child: Table(
                           defaultColumnWidth: FlexColumnWidth(1.0),
@@ -170,60 +193,74 @@ class _TabScreen4State extends State<TabScreen4> {
                           ],
                         ),
                       ),
-                    ),
+                    ),*/
                   ],
                 ),
               ),
-              SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: Column(
-                  children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        Container(
-                          height: 25,
-                          width: 25,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white,
-                            border: Border.all(color: Colors.lightBlueAccent),
-                          ),
-                          child: Icon(
-                            Icons.phone_iphone,
-                            color: Colors.blue[600],
-                          ),
+              SizedBox(height: 15),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Container(
+                        child: Text(widget.user.name ?? "Unregistered user",
+                            style: TextStyle(
+                                fontSize: 20,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold)),
+                      ),
+                      SizedBox(width: 5),
+                      Icon(
+                        Icons.check_circle_outline,
+                        color: Colors.white,
+                      )
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  Container(
+                      padding: EdgeInsets.only(left: 15),
+                      alignment: Alignment.center,
+                      child: Visibility(
+                        visible: _dateShow,
+                        child: Text(
+                          "Joined since  "+ f2.format(parsedDate??now),
+                          style: TextStyle(
+                              color: Colors.grey[300],
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.6),
                         ),
-                        SizedBox(width: 8),
-                        Container(
-                          child: Text(
-                            widget.user.phone,
+                      )),
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Container(
+                      width: 200,
+                      decoration: BoxDecoration(
+                        color: Colors.blueGrey[900],
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      padding: EdgeInsets.all(15.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Text(
+                            'Switch Account Type',
                             style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold),
                           ),
-                        ),
-                        Expanded(
-                            flex: 1,
-                            child: Row(
-                              children: <Widget>[
-                                Icon(
-                                  MdiIcons.typewriter,
-                                  color: Colors.white,
-                                ),
-                                Text(
-                                  widget.user.type,
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold),
-                                )
-                              ],
-                            ))
-                      ],
+                          Icon(
+                            Icons.swap_horiz,
+                            color: Colors.white,
+                          )
+                        ],
+                      ),
                     ),
-                  ],
-                ),
+                  )
+                ],
               ),
+
               /*  Card(
                 elevation: 6,
                 child: Padding(
@@ -388,120 +425,123 @@ class _TabScreen4State extends State<TabScreen4> {
                     )),
               ),
               */
-              Container(
-                  padding: EdgeInsets.only(left: 15),
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Joined: " + f.format(parsedDate),
-                    style: TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
-                  )),
-              SizedBox(height: 25),
-              Container(
-                child: Center(
-                  child: Text(
-                    'Settings',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
-                  ),
-                ),
-              ),
-              Divider(
-                height: 2,
-                color: Colors.grey,
-              ),
-              Expanded(
-                child: ListView(
-                  padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
-                  shrinkWrap: true,
-                  children: <Widget>[
-                    MaterialButton(
-                        onPressed: _changeName,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          //crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Icon(
-                              Icons.person_outline,
-                              color: Colors.blueAccent,
-                            ),
-                            Text('Change Your Name'),
-                          ],
-                        )),
-                    Divider(
-                      height: 2,
-                      color: Colors.grey[850],
-                    ),
-                    SizedBox(height: 10),
-                    MaterialButton(
-                        onPressed: _changeName,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: <Widget>[
-                            Icon(Icons.alternate_email,
-                                color: Colors.blueAccent),
-                            Text('Change Email')
-                          ],
-                        )),
-                    SizedBox(height: 10),
-                    MaterialButton(
-                        onPressed: _changeName,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: <Widget>[
-                            Icon(Icons.lock_outline, color: Colors.blueAccent),
-                            Text('Change Password')
-                          ],
-                        )),
-                    SizedBox(height: 10),
-                    MaterialButton(
-                        onPressed: _changeName,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: <Widget>[
-                            Icon(Icons.settings_phone,
-                                color: Colors.blueAccent),
-                            Text('Change Phone No')
-                          ],
-                        )),
-                    SizedBox(height: 10),
-                    MaterialButton(
-                        onPressed: _changeName,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: <Widget>[
-                            Icon(Icons.work, color: Colors.blueAccent),
-                            Text('Change Account Type')
-                          ],
-                        )),
-                    SizedBox(height: 10),
-                    MaterialButton(
-                        onPressed: _changeName,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: <Widget>[
-                            Icon(Icons.exit_to_app, color: Colors.redAccent),
-                            Text(
-                              'Logout',
-                              style: TextStyle(
-                                  color: Colors.red,
-                                  fontWeight: FontWeight.bold),
-                            )
-                          ],
-                        )),
-                    MaterialButton(
-                        onPressed: _changeName,
-                        child: Column(
-                          children: <Widget>[
-                            Icon(Icons.person_outline),
-                            Text('Change your name')
-                          ],
-                        )),
-                  ],
-                ),
-              )
             ],
           ),
         ),
+        Container(
+          margin: EdgeInsets.only(top: 400.0),
+          decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20.0),
+                  topRight: Radius.circular(20.0))),
+        ),
+        Container(
+            margin: EdgeInsets.only(top: 350),
+            color: Colors.transparent,
+            child: CustomScrollView(
+              primary: false,
+              slivers: <Widget>[
+                SliverPadding(
+                  padding: EdgeInsets.all(20.0),
+                  sliver: SliverGrid.count(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                    children: <Widget>[
+                      Container(
+                        child: Card(
+                          elevation: 5,
+                          child: MaterialButton(
+                            onPressed: () {},
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Icon(
+                                  Icons.credit_card,
+                                  size: 35,
+                                  color: Colors.blue,
+                                ),
+                                Text('Your Credit: ' + widget.user.credit),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Text('<Buy Credit>')
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        child: Card(
+                          elevation: 5,
+                          child: MaterialButton(
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          ProfileDetail(user: widget.user)));
+                            },
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Icon(
+                                  Icons.person_outline,
+                                  size: 35,
+                                  color: Colors.blueGrey[300],
+                                ),
+                                Text('Manage Privacy')
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        child: Card(
+                          elevation: 5,
+                          child: MaterialButton(
+                            onPressed: () {},
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Icon(
+                                  Icons.settings,
+                                  size: 35,
+                                  color: Colors.blue,
+                                ),
+                                Text('Settings')
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        child: Card(
+                          elevation: 5,
+                          child: MaterialButton(
+                            onPressed: () {
+                              _logout();
+                            },
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Icon(
+                                  Icons.exit_to_app,
+                                  size: 35,
+                                  color: Colors.red[600],
+                                ),
+                                Text('Logout')
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            )),
       ]),
     );
   }
@@ -651,38 +691,82 @@ class _TabScreen4State extends State<TabScreen4> {
         });
 
     /*PickedFile _image = await _picker.getImage(
-                            source: ImageSource.camera,
-                            maxHeight: 400,
-                            maxWidth: 300,
-                            imageQuality: 70,
-                          );
-                          if (_image == null) {
-                            Toast.show("Please upload your profile picture", context,
-                                duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-                          } else {
-                            final File file = File(_image.path);
-                            String base64Image = base64Encode(file.readAsBytesSync());
-                            http.post(server + "/php/upload_image.php", body: {
-                              "encoded_string": base64Image,
-                              "email": widget.user.email
-                            }).then((res) {
-                              print(res.body);
-                              if (res.body == "success") {
-                                setState(() {
-                                  DefaultCacheManager manager = new DefaultCacheManager();
-                                  manager.emptyCache();
-                                });
-                              } else {
-                                Toast.show('Failed', context,
-                                    duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-                              }
-                            }).catchError((err) {
-                              print(err);
-                            });
-                          }*/
+                                                          source: ImageSource.camera,
+                                                          maxHeight: 400,
+                                                          maxWidth: 300,
+                                                          imageQuality: 70,
+                                                        );
+                                                        if (_image == null) {
+                                                          Toast.show("Please upload your profile picture", context,
+                                                              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+                                                        } else {
+                                                          final File file = File(_image.path);
+                                                          String base64Image = base64Encode(file.readAsBytesSync());
+                                                          http.post(server + "/php/upload_image.php", body: {
+                                                            "encoded_string": base64Image,
+                                                            "email": widget.user.email
+                                                          }).then((res) {
+                                                            print(res.body);
+                                                            if (res.body == "success") {
+                                                              setState(() {
+                                                                DefaultCacheManager manager = new DefaultCacheManager();
+                                                                manager.emptyCache();
+                                                              });
+                                                            } else {
+                                                              Toast.show('Failed', context,
+                                                                  duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+                                                            }
+                                                          }).catchError((err) {
+                                                            print(err);
+                                                          });
+                                                        }*/
   }
 
   void _changeName() {}
+
+  void _logout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (widget.user.email != null) {
+      showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                ),
+                title: Row(
+                  children: <Widget>[
+                    Text('Log out'),
+                    Icon(Icons.warning),
+                  ],
+                ),
+                content: Text('Are you sure want to logout from your account?'),
+                actions: <Widget>[
+                  MaterialButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      prefs.setString('email', '');
+                      prefs.setString('pass', '');
+                      print('Logout');
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => LoginScreen()));
+                    },
+                    child: Text(
+                      "Yes",
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
+                  MaterialButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(false);
+                    },
+                    child: Text('No'),
+                  )
+                ],
+              ));
+    }
+  }
 }
 
 class DetailScreen extends StatefulWidget {

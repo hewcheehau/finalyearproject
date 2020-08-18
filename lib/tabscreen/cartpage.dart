@@ -15,6 +15,7 @@ import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:toast/toast.dart';
 import 'package:fypv1/main.dart';
+import 'package:random_string/random_string.dart';
 
 class CartPage extends StatefulWidget {
   final User user;
@@ -869,5 +870,33 @@ class _CartPageState extends State<CartPage> {
           _updatePayment();
         }
       });
+        String generateOrderid() {
+    var now = new DateTime.now();
+    var formatter = new DateFormat('ddMMyyyy-');
+    String orderid = widget.user.email.substring(1, 4) +
+        "-" +
+        formatter.format(now) +
+        randomAlphaNumeric(6);
+    return orderid;
+  }
+
+  Future<void> _checkOut()async {
+    if(_amountPayable<0){
+      double newamount = _amountPayable*-1;
+      await _payusingCredit(newamount);
+      
+          }
+          if(_cashOnDelivery){
+            print("COD");
+            Toast.show("Cash On Delivery", context,duration: Toast.LENGTH_SHORT,gravity: Toast.BOTTOM);
+
+          }else {
+            Toast.show("Please select payment option.", context,duration:Toast.LENGTH_LONG,gravity:Toast.BOTTOM);
+
+          }
+          
+        }
+      
+      Future<void>  _payusingCredit(double newamount)async {}
  
 }

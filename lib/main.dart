@@ -3,7 +3,7 @@ import 'package:fypv1/tabscreen/tabscreen.dart';
 import 'package:fypv1/user.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'tabscreen/tabscreen4.dart';
+import 'tabscreen/profilescreen.dart';
 import 'tabscreen/tabscreen.dart';
 import 'tabscreen/tabscreen2.dart';
 import 'package:fypv1/tabscreen/tabscreendemo.dart';
@@ -43,7 +43,7 @@ class _MainScreenState extends State<MainScreen> {
       MainPage(user: widget.user),
    //   CartPage(user: widget.user),
       TabScreen2(user: widget.user),
-      TabScreen4(user: widget.user),
+      ProfileScreen(user: widget.user),
     ];
   }
 

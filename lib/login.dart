@@ -317,15 +317,20 @@ class _LoginScreenState extends State<LoginScreen> {
                                                         phone: dres[3],
                                                         type: dres[4],
                                                         credit: dres[5],
-                                                        address: dres[6],
-                                                        datereg: dres[7],
+                                                        datereg: dres[6],
+                                                        address: dres[7],
+                                                        
                                                         quantity: '0'
                                                     );
                                                     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>MainScreen(user:user)));
                                                   }
                                                   else{
                                                     print('failed');
-                                                    pr.hide();
+                                                     Future.delayed(Duration(seconds: 2)).then((value) {
+                                                      pr.hide().whenComplete(() {
+                                                        print(pr.isShowing());
+                                                      });
+                                                    });
                                                   }
                                                 });
                     
