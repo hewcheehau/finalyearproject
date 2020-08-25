@@ -110,7 +110,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        Stack(
+      Stack(
           children: <Widget>[
             Padding(
               padding: EdgeInsets.only(left: 50, right: 50, top: 5),
@@ -122,7 +122,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                     image: DecorationImage(
                         image: _image == null
                             ? AssetImage(pathAsset)
-                            : FileImage(file),
+                            : FileImage(_image),
                         fit: BoxFit.fill)),
               ),
             ),
@@ -132,7 +132,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                 child: new FloatingActionButton(
                   child: const Icon(Icons.camera_alt),
                   backgroundColor: Colors.black54,
-                  onPressed: _takePicture,
+                  onPressed: _choose,
                 ))
           ],
         ),
@@ -249,7 +249,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
     );
   }
 
-  void _choose() {
+  Future _choose() async {
     showModalBottomSheet(
         context: context,
         builder: (builder) {
@@ -261,7 +261,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                   leading: Icon(Icons.camera_alt),
                   title: Text('Camera'),
                   onTap: () async {
-                    PickedFile _image = await _picker.getImage(
+                    PickedFile image = await _picker.getImage(
                       source: ImageSource.camera,
                       maxHeight: 400,
                       maxWidth: 300,
@@ -269,6 +269,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                     );
 
                     setState(() {
+                      _image = File(image.path);
                       Navigator.pop(context);
                       
                     });
@@ -315,8 +316,8 @@ class _RegisterWidgetState extends State<RegisterWidget> {
       pr.show();
 
       print('123');
-      file = File(_image.path);
-      String base64Image = base64Encode(file.readAsBytesSync());
+     // file = File(_image.path);
+      String base64Image = base64Encode(_image.readAsBytesSync());
       http.post(urlUpload, body: {
         "encoded_string": base64Image,
         "name": _name,

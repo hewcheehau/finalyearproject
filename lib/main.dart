@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fypv1/tabscreen/tabscreen.dart';
+import 'package:fypv1/tabscreen/transporter.dart';
 import 'package:fypv1/user.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,6 +16,8 @@ import 'package:async/async.dart';
 import 'dart:convert';
 import 'package:badges/badges.dart';
 import 'package:custom_navigator/custom_navigation.dart';
+import 'tabscreen/trymap.dart';
+import 'tabscreen/provider.dart';
 
 class MainScreen extends StatefulWidget {
   final User user;
@@ -39,12 +42,25 @@ class _MainScreenState extends State<MainScreen> {
     super.initState();
    
     print('mainscreen;');
+    if(widget.user.type == 'Food Buyer'||widget.user.type=='unregistered'){
     tabs = [
       MainPage(user: widget.user),
-   //   CartPage(user: widget.user),
-      TabScreen2(user: widget.user),
+      MapSample(),
       ProfileScreen(user: widget.user),
     ];
+    }else if(widget.user.type == 'Transporter'){
+       tabs = [
+      TransporterScreen(user:widget.user),
+      MapSample(),
+      ProfileScreen(user: widget.user),
+    ];
+    }else{
+       tabs = [
+      ProviderScreen(user:widget.user),
+      MapSample(),
+      ProfileScreen(user: widget.user),
+    ];
+    }
   }
 
   String $pagetitle = "Walking-distance";

@@ -276,7 +276,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                                 context, MaterialPageRoute(builder: (context) => SelectAccountType()));
                                           }
                                         
-                                          void _onLogin() {
+                                          void _onLogin(){
+                                            
                                             _email = _emcontroller.text;
                                             _password = _pwcontroller.text;
                     
@@ -303,6 +304,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   duration: Toast.LENGTH_LONG, gravity:Toast.BOTTOM);
                     
                                                   if(dres[0]=="success"){
+
+                                                    
                                                     Future.delayed(Duration(seconds: 2)).then((value) {
                                                       pr.hide().whenComplete(() {
                                                         print(pr.isShowing());

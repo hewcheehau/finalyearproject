@@ -390,7 +390,8 @@ class _FoodDetailState extends State<FoodDetail> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setInt("cquantity", 0);
     _foodid = (prefs.getString("foodid"));
-    if (widget.user.email == "unregister@hewdeliver.com") {
+    
+    if (widget.user.email == "unregister@hewdeliver.com"||widget.user.name == 'unregistered') {
       Toast.show("Please Register/Login.", context,
           duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       return;

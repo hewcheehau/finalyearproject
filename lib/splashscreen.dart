@@ -96,7 +96,7 @@ class _ProgressIndicatorState extends State<ProgressIndicator>
     } else {
       User user = new User(
           name: "unregistered",
-          email: "user@noregisterwaklingdeliver.com",
+          email: "unregistered",
           phone: "unregistered",
           type: "unregistered",
           credit: "unregistered",
@@ -145,7 +145,7 @@ class _ProgressIndicatorState extends State<ProgressIndicator>
         print("no register");
         User user = new User(
             name: "unregistered",
-            email: "user@noregisterwaklingdeliver.com",
+            email: "unregistered",
             phone: "unregistered",
             type: "unregistered",
             credit: "unregistered",

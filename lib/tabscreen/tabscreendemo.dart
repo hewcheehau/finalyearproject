@@ -50,7 +50,8 @@ class _MainPageState extends State<MainPage> {
     refreshKey = GlobalKey<RefreshIndicatorState>();
     _loadDate();
     _loadCart();
-    init();
+    //init();
+
 
     if (widget.user.type == 'Food Provider') {
       _isFoodprovider = true;
@@ -95,7 +96,7 @@ class _MainPageState extends State<MainPage> {
             child: IconButton(icon: 
             Badge(
               alignment: Alignment.topRight,
-              showBadge: true,
+              showBadge: widget.user.quantity=='0'?false:true,
               badgeContent: Text(widget.user.quantity??Text('0'),style:TextStyle(color: Colors.white,fontWeight: FontWeight.bold)),
                         child: Icon(MdiIcons.cartOutline,
               color: Colors.blueAccent,
@@ -103,6 +104,10 @@ class _MainPageState extends State<MainPage> {
               
               ),
             ), onPressed: (){
+              if(widget.user.name == 'unregistered'){
+                Toast.show('Please register/login', context,duration:Toast.LENGTH_LONG,gravity:Toast.BOTTOM);
+                return;
+              }
                Navigator.push(context, MaterialPageRoute(builder: (context)=>CartPage(user:widget.user)));
             }),
           )
@@ -694,10 +699,16 @@ class _MainPageState extends State<MainPage> {
 
   Future init() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    if(widget.user.quantity!="0"){
+        _visible = true;
+    }
   }
 
   void _loadCart() async {
     String urlLoadCart = server + "/php/load_cart.php";
+    if(widget.user.name =='unregistered'){
+      return;
+    }
     http.post(urlLoadCart, body: {
       "email": widget.user.email,
     }).then((res) {

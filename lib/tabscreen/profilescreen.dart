@@ -34,6 +34,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final f = new DateFormat('dd-MM-yyyy hh:mm a');
   final f2 = new DateFormat('dd-MM-yyyy');
   DateTime now = DateTime.now();
+  bool _isFoodBuyer = true;
+  bool _isTransporter = true;
+  bool _isProvider = true;
+  bool _isLoading = false;
 
   var parsedDate;
   bool _dateShow = true;
@@ -41,6 +45,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     print('profile screen');
+    switch (widget.user.type) {
+      case "Food Buyer":
+        _isFoodBuyer = false;
+        break;
+      case "Transporter":
+        _isTransporter = false;
+        break;
+      case "Food Provider":
+        _isProvider = false;
+        break;
+    }
   }
 
   @override
@@ -49,8 +64,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     screenWidth = MediaQuery.of(context).size.width;
     if (widget.user.name == "unregistered") {
       _dateShow = false;
-    }else{
-   parsedDate = DateTime.parse(widget.user.datereg);
+    } else {
+      parsedDate = DateTime.parse(widget.user.datereg);
     }
     return Scaffold(
       backgroundColor: Color(0xffF8F8FA),
@@ -225,7 +240,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Visibility(
                         visible: _dateShow,
                         child: Text(
-                          "Joined since  "+ f2.format(parsedDate??now),
+                          "Joined since  " + f2.format(parsedDate ?? now),
                           style: TextStyle(
                               color: Colors.grey[300],
                               fontWeight: FontWeight.bold,
@@ -241,20 +256,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         borderRadius: BorderRadius.circular(50),
                       ),
                       padding: EdgeInsets.all(15.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Text(
-                            'Switch Account Type',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          Icon(
-                            Icons.swap_horiz,
-                            color: Colors.white,
-                          )
-                        ],
+                      child: GestureDetector(
+                        onTap: () {
+                          _onSwapAccount();
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Text(
+                              'Switch Account Type',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            Icon(
+                              Icons.swap_horiz,
+                              color: Colors.white,
+                            )
+                          ],
+                        ),
                       ),
                     ),
                   )
@@ -262,169 +282,169 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
 
               /*  Card(
-                elevation: 6,
-                child: Padding(
-                    padding: EdgeInsets.all(5),
-                    child: Column(
-                      children: <Widget>[
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            GestureDetector(
-                              
-                              onTap: _takePicture,
-                              child: Container(
-                                  height: screenHeight / 4.8,
-                                  width: screenWidth / 3.2,
-                                  decoration: new BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    border: Border.all(width:2.0)
-                                  ),
-                                  child: CachedNetworkImage(
-                                    
-                                    fit: BoxFit.cover,
-                                    imageUrl: server + "/profile/default.jpg?",
-                                    placeholder: (context, url) => new SizedBox(
-                                      height: 10.0,
-                                      width: 10.0,
-                                      child: CircularProgressIndicator(),
-                                    ),
-                                    errorWidget: (context, url, error) =>
-                                        new Icon(
-                                      Icons.camera_enhance,
-                                      size: 65,
-                                    ),
-                                  )),
-                            ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Expanded(
-                              child: Container(
-                                child: Container(
-                                  child: Table(
-                                    defaultColumnWidth: FlexColumnWidth(1.0),
-                                    columnWidths: {
-                                      0: FlexColumnWidth(3.5),
-                                      1: FlexColumnWidth(6.5),
-                                    },
-                                    children: [
-                                      TableRow(children: [
-                                        TableCell(
-                                          child: Container(
-                                            alignment: Alignment.centerLeft,
-                                            height: 20,
-                                            child: Text(
-                                              'Name',
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.black),
-                                            ),
-                                          ),
+                                          elevation: 6,
+                                          child: Padding(
+                                              padding: EdgeInsets.all(5),
+                                              child: Column(
+                                                children: <Widget>[
+                                                  Row(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: <Widget>[
+                                                      GestureDetector(
+                                                        
+                                                        onTap: _takePicture,
+                                                        child: Container(
+                                                            height: screenHeight / 4.8,
+                                                            width: screenWidth / 3.2,
+                                                            decoration: new BoxDecoration(
+                                                              shape: BoxShape.circle,
+                                                              border: Border.all(width:2.0)
+                                                            ),
+                                                            child: CachedNetworkImage(
+                                                              
+                                                              fit: BoxFit.cover,
+                                                              imageUrl: server + "/profile/default.jpg?",
+                                                              placeholder: (context, url) => new SizedBox(
+                                                                height: 10.0,
+                                                                width: 10.0,
+                                                                child: CircularProgressIndicator(),
+                                                              ),
+                                                              errorWidget: (context, url, error) =>
+                                                                  new Icon(
+                                                                Icons.camera_enhance,
+                                                                size: 65,
+                                                              ),
+                                                            )),
+                                                      ),
+                                                      SizedBox(
+                                                        width: 10,
+                                                      ),
+                                                      Expanded(
+                                                        child: Container(
+                                                          child: Container(
+                                                            child: Table(
+                                                              defaultColumnWidth: FlexColumnWidth(1.0),
+                                                              columnWidths: {
+                                                                0: FlexColumnWidth(3.5),
+                                                                1: FlexColumnWidth(6.5),
+                                                              },
+                                                              children: [
+                                                                TableRow(children: [
+                                                                  TableCell(
+                                                                    child: Container(
+                                                                      alignment: Alignment.centerLeft,
+                                                                      height: 20,
+                                                                      child: Text(
+                                                                        'Name',
+                                                                        style: TextStyle(
+                                                                            fontWeight: FontWeight.bold,
+                                                                            color: Colors.black),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  TableCell(
+                                                                    child: Container(
+                                                                      alignment: Alignment.centerLeft,
+                                                                      height: 20,
+                                                                      child: Text(
+                                                                        widget.user.name,
+                                                                        style: TextStyle(
+                                                                            fontWeight: FontWeight.bold,
+                                                                            fontSize: 14,
+                                                                            color: Colors.black87),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ]),
+                                                                TableRow(children: [
+                                                                  TableCell(
+                                                                    child: Container(
+                                                                      alignment: Alignment.centerLeft,
+                                                                      height: 20,
+                                                                      child: Text('Email',
+                                                                          style: TextStyle(
+                                                                              fontWeight:
+                                                                                  FontWeight.bold)),
+                                                                    ),
+                                                                  ),
+                                                                  TableCell(
+                                                                    child: Container(
+                                                                      alignment: Alignment.centerLeft,
+                                                                      height: 20,
+                                                                      child: Text(
+                                                                        widget.user.email,
+                                                                        style: TextStyle(
+                                                                            fontWeight: FontWeight.bold,
+                                                                            fontSize: 14),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ]),
+                                                                TableRow(children: [
+                                                                  TableCell(
+                                                                    child: Container(
+                                                                      alignment: Alignment.centerLeft,
+                                                                      height: 20,
+                                                                      child: Text('Phone',
+                                                                          style: TextStyle(
+                                                                              fontWeight:
+                                                                                  FontWeight.bold)),
+                                                                    ),
+                                                                  ),
+                                                                  TableCell(
+                                                                    child: Container(
+                                                                      alignment: Alignment.centerLeft,
+                                                                      height: 20,
+                                                                      child: Text(
+                                                                        widget.user.phone,
+                                                                        style: TextStyle(
+                                                                            fontWeight: FontWeight.bold,
+                                                                            fontSize: 14),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ]),
+                                                                TableRow(children: [
+                                                                  TableCell(
+                                                                    child: Container(
+                                                                      alignment: Alignment.centerLeft,
+                                                                      height: 20,
+                                                                      child: Text('Joined since',
+                                                                          style: TextStyle(
+                                                                              fontWeight:
+                                                                                  FontWeight.bold)),
+                                                                    ),
+                                                                  ),
+                                                                  TableCell(
+                                                                    child: Container(
+                                                                      alignment: Alignment.centerLeft,
+                                                                      height: 20,
+                                                                      child: Text(
+                                                                        widget.user.datereg,
+                                                                        style: TextStyle(
+                                                                            fontWeight: FontWeight.bold,
+                                                                            fontSize: 14),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ]),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      SizedBox(
+                                                        height: 2,
+                                                      ),
+                                                      Divider(
+                                                          height: 2,
+                                                          color: Color.fromRGBO(101, 255, 218, 50))
+                                                    ],
+                                                  )
+                                                ],
+                                              )),
                                         ),
-                                        TableCell(
-                                          child: Container(
-                                            alignment: Alignment.centerLeft,
-                                            height: 20,
-                                            child: Text(
-                                              widget.user.name,
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 14,
-                                                  color: Colors.black87),
-                                            ),
-                                          ),
-                                        ),
-                                      ]),
-                                      TableRow(children: [
-                                        TableCell(
-                                          child: Container(
-                                            alignment: Alignment.centerLeft,
-                                            height: 20,
-                                            child: Text('Email',
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.bold)),
-                                          ),
-                                        ),
-                                        TableCell(
-                                          child: Container(
-                                            alignment: Alignment.centerLeft,
-                                            height: 20,
-                                            child: Text(
-                                              widget.user.email,
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 14),
-                                            ),
-                                          ),
-                                        ),
-                                      ]),
-                                      TableRow(children: [
-                                        TableCell(
-                                          child: Container(
-                                            alignment: Alignment.centerLeft,
-                                            height: 20,
-                                            child: Text('Phone',
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.bold)),
-                                          ),
-                                        ),
-                                        TableCell(
-                                          child: Container(
-                                            alignment: Alignment.centerLeft,
-                                            height: 20,
-                                            child: Text(
-                                              widget.user.phone,
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 14),
-                                            ),
-                                          ),
-                                        ),
-                                      ]),
-                                      TableRow(children: [
-                                        TableCell(
-                                          child: Container(
-                                            alignment: Alignment.centerLeft,
-                                            height: 20,
-                                            child: Text('Joined since',
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.bold)),
-                                          ),
-                                        ),
-                                        TableCell(
-                                          child: Container(
-                                            alignment: Alignment.centerLeft,
-                                            height: 20,
-                                            child: Text(
-                                              widget.user.datereg,
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 14),
-                                            ),
-                                          ),
-                                        ),
-                                      ]),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 2,
-                            ),
-                            Divider(
-                                height: 2,
-                                color: Color.fromRGBO(101, 255, 218, 50))
-                          ],
-                        )
-                      ],
-                    )),
-              ),
-              */
+                                        */
             ],
           ),
         ),
@@ -462,11 +482,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   size: 35,
                                   color: Colors.blue,
                                 ),
-                                Text('Your Credit: ' + widget.user.credit),
+                                Text('My Credit'),
                                 SizedBox(
                                   height: 5,
                                 ),
-                                Text('<Buy Credit>')
                               ],
                             ),
                           ),
@@ -477,6 +496,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           elevation: 5,
                           child: MaterialButton(
                             onPressed: () {
+                              if(widget.user.email == 'unregistered'){
+                                Toast.show('Please register/login', context,duration: Toast.LENGTH_LONG,gravity: Toast.BOTTOM);
+                                return;
+                              }
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -691,35 +714,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
         });
 
     /*PickedFile _image = await _picker.getImage(
-                                                          source: ImageSource.camera,
-                                                          maxHeight: 400,
-                                                          maxWidth: 300,
-                                                          imageQuality: 70,
-                                                        );
-                                                        if (_image == null) {
-                                                          Toast.show("Please upload your profile picture", context,
-                                                              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-                                                        } else {
-                                                          final File file = File(_image.path);
-                                                          String base64Image = base64Encode(file.readAsBytesSync());
-                                                          http.post(server + "/php/upload_image.php", body: {
-                                                            "encoded_string": base64Image,
-                                                            "email": widget.user.email
-                                                          }).then((res) {
-                                                            print(res.body);
-                                                            if (res.body == "success") {
-                                                              setState(() {
-                                                                DefaultCacheManager manager = new DefaultCacheManager();
-                                                                manager.emptyCache();
-                                                              });
-                                                            } else {
-                                                              Toast.show('Failed', context,
-                                                                  duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-                                                            }
-                                                          }).catchError((err) {
-                                                            print(err);
-                                                          });
-                                                        }*/
+                                                                                    source: ImageSource.camera,
+                                                                                    maxHeight: 400,
+                                                                                    maxWidth: 300,
+                                                                                    imageQuality: 70,
+                                                                                  );
+                                                                                  if (_image == null) {
+                                                                                    Toast.show("Please upload your profile picture", context,
+                                                                                        duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+                                                                                  } else {
+                                                                                    final File file = File(_image.path);
+                                                                                    String base64Image = base64Encode(file.readAsBytesSync());
+                                                                                    http.post(server + "/php/upload_image.php", body: {
+                                                                                      "encoded_string": base64Image,
+                                                                                      "email": widget.user.email
+                                                                                    }).then((res) {
+                                                                                      print(res.body);
+                                                                                      if (res.body == "success") {
+                                                                                        setState(() {
+                                                                                          DefaultCacheManager manager = new DefaultCacheManager();
+                                                                                          manager.emptyCache();
+                                                                                        });
+                                                                                      } else {
+                                                                                        Toast.show('Failed', context,
+                                                                                            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+                                                                                      }
+                                                                                    }).catchError((err) {
+                                                                                      print(err);
+                                                                                    });
+                                                                                  }*/
   }
 
   void _changeName() {}
@@ -766,6 +789,149 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               ));
     }
+  }
+
+  void _onSwapAccount() {
+    String type1, type2;
+
+    if (widget.user.name == 'unregistered') {
+      Toast.show('Please register/login', context,
+          duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+      return;
+    }
+    showDialog(
+        context: context,
+        builder: (BuildContext context) => SimpleDialog(
+              title: Row(
+                children: <Widget>[
+                   Text('Select Account Type'),
+                   Icon(Icons.swap_horiz)
+                ],
+              ),
+              backgroundColor: Colors.grey[30],
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+              children: <Widget>[
+                Visibility(
+                  visible: _isFoodBuyer,
+                  child: SimpleDialogOption(
+                    onPressed: () {
+                      
+                            showDialog(context: context,builder:(context)=>AlertDialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)
+                        ),
+                        title: Text('Change to Food buyer mode?'),
+                        actions: <Widget>[
+                          MaterialButton(onPressed: (){
+                            
+                            String type= 'Food Buyer';
+                            http.post(server+'/php/update_profile.php',body: {
+                              'email':widget.user.email,
+                              'type' : type,
+                            }).then((res) {
+                              if(res.body=='success'){
+                                setState(() {
+                                  
+                                });
+                                Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>SplashScreen()), (Route<dynamic>route) => false);
+                              }
+                            });
+
+                          },
+                          child: Text('Yes'),),
+                           MaterialButton(onPressed: ()=>{Navigator.of(context).pop()},
+                          child: Text('No'),),
+                        ],
+                      ));
+                    },
+                    child: Text('Food Buyer'),
+                  ),
+                ),
+                Divider(),
+                Visibility(
+                  visible: _isTransporter,
+                  child: SimpleDialogOption(
+                    onPressed: () {
+                      setState(() {
+                        _isLoading = true;
+                      });
+                      showDialog(context: context,builder:(context)=>AlertDialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)
+                        ),
+                        title: Text('Change to transporter mode?'),
+                        actions: <Widget>[
+                          MaterialButton(onPressed: (){
+                            
+                            String type= 'Transporter';
+                            http.post(server+'/php/update_profile.php',body: {
+                              'email':widget.user.email,
+                              'type' : type,
+                            }).then((res) {
+                              if(res.body=='success'){
+                             //   Navigator.of(context).pop();
+                               Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>SplashScreen()), (Route<dynamic>route) => false);
+                              }
+                            });
+
+                          },
+                          child: Text('Yes'),),
+                           MaterialButton(onPressed: ()=>{Navigator.of(context).pop()},
+                          child: Text('No'),),
+                        ],
+                      ));
+                    },
+                    child: Text('Transporter'),
+                  ),
+                ),
+                Divider(),
+                Visibility(
+                  visible: _isProvider,
+                  child: SimpleDialogOption(
+
+                    onPressed: () {
+                      setState(() {
+                        _isLoading = true;
+                      });
+                      showDialog(context: context,builder:(context)=>AlertDialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)
+                        ),
+                        title: Text('Change to food provider mode?'),
+                        actions: <Widget>[
+                          MaterialButton(onPressed: (){
+                            
+                            String type= 'Food Provider';
+                            http.post(server+'/php/update_profile.php',body: {
+                              'email':widget.user.email,
+                              'type' : type,
+                            }).then((res) {
+                              if(res.body=='success'){
+                             //   Navigator.of(context).pop();
+                               Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>SplashScreen()), (Route<dynamic>route) => false);
+                              }
+                            });
+
+                          },
+                          child: Text('Yes'),),
+                           MaterialButton(onPressed: ()=>{Navigator.of(context).pop()},
+                          child: Text('No'),),
+                        ],
+                      ));
+                    },
+                    child: Text('Food Provider'),
+                  ),
+                ),
+                  Divider(),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: OutlineButton(
+                      
+                      onPressed: ()=>{Navigator.of(context).pop()},child: Text('Exit'),),
+                  )
+              ],
+            ));
   }
 }
 

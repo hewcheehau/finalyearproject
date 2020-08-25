@@ -40,6 +40,7 @@ dependencies:
   badges: ^1.1.1
   custom_navigator: ^0.2.0
   random_string: ^2.1.0
+  webview_flutter: ^0.3.22+1
   
  
 
@@ -73,6 +74,7 @@ flutter:
     - asset/images/logofyp2.png
     - asset/images/cover1.png
     - asset/images/profile.jpg
+    - asset/images/nofood.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

@@ -16,6 +16,7 @@ import 'package:intl/intl.dart';
 import 'package:toast/toast.dart';
 import 'package:fypv1/main.dart';
 import 'package:random_string/random_string.dart';
+import 'package:fypv1/payment.dart';
 
 class CartPage extends StatefulWidget {
   final User user;
@@ -67,18 +68,26 @@ class _CartPageState extends State<CartPage> {
         appBar: AppBar(
           backgroundColor: Colors.white,
           automaticallyImplyLeading: false,
-          leading: IconButton(icon: Icon(Icons.arrow_back_ios,color: Colors.blueAccent,), onPressed: (){
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>MainScreen(user:widget.user)));
-          
-            }),
+          leading: IconButton(
+              icon: Icon(
+                Icons.arrow_back_ios,
+                color: Colors.blueAccent,
+              ),
+              onPressed: () {
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => MainScreen(user: widget.user)));
+              }),
           centerTitle: true,
           title: Text(
             'My Cart',
-            style: TextStyle(color: Colors.blueAccent,fontSize: 20,fontWeight: FontWeight.w800),
+            style: TextStyle(
+                color: Colors.blueAccent,
+                fontSize: 20,
+                fontWeight: FontWeight.w800),
           ),
-          
           actions: <Widget>[
-            
             IconButton(
                 icon: Icon(
                   Icons.delete_forever,
@@ -144,7 +153,7 @@ class _CartPageState extends State<CartPage> {
                                         SizedBox(
                                           height: 10,
                                         ),
-                                        Container(
+                                        /* Container(
                                             padding: EdgeInsets.only(left: 10),
                                             alignment: Alignment.topLeft,
                                             child: Column(
@@ -163,7 +172,7 @@ class _CartPageState extends State<CartPage> {
                                                   ],
                                                 ),
                                               ],
-                                            )),
+                                            )),*/
                                         SizedBox(
                                           height: 10,
                                         ),
@@ -175,26 +184,37 @@ class _CartPageState extends State<CartPage> {
                                                 FlexColumnWidth(1.0),
                                             columnWidths: {
                                               0: FlexColumnWidth(7),
-                                              1: FlexColumnWidth(5),
+                                              1: FlexColumnWidth(6),
                                             },
                                             children: [
                                               TableRow(children: [
                                                 TableCell(
                                                   child: Container(
                                                     height: 60,
-                                                    child:
-                                                        Text('Current address'),
+                                                    child: Text(
+                                                      'Current address',
+                                                      style: TextStyle(
+                                                          color: Colors.black87,
+                                                          fontSize: 15,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
                                                   ),
                                                 ),
                                                 TableCell(
                                                   child: Container(
                                                     height: 60,
-                                                    child: Text(
-                                                      curaddress ??
-                                                          "Address not set.",
-                                                      maxLines: 5,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        _loadMapDialog();
+                                                      },
+                                                      child: Text(
+                                                        curaddress ??
+                                                            "Address not set.",
+                                                        maxLines: 5,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
                                                     ),
                                                   ),
                                                 )
@@ -279,8 +299,8 @@ class _CartPageState extends State<CartPage> {
                                                                           20),
                                                                 ),
                                                                 InkWell(
-                                                                    onTap: () async {
-                                                                      
+                                                                    onTap:
+                                                                        () async {
                                                                       setState(
                                                                           () {
                                                                         cQuantity =
@@ -292,7 +312,7 @@ class _CartPageState extends State<CartPage> {
                                                                             int.parse(itemCart[index -
                                                                                 1]['fquantity'])) {
                                                                           cQuantity++;
-                                                                          
+
                                                                           // itemCart[index]['cquantity'] = cQuantity;
                                                                         }
                                                                         String
@@ -518,8 +538,8 @@ class _CartPageState extends State<CartPage> {
                             } else {
                               _checkSelect = true;
                             }
-                            if(_checkSelect){
-                              _updatePayment();
+                            if (_checkSelect) {
+                              _proceedPayment();
                             }
                             setState(() {});
                           },
@@ -603,9 +623,8 @@ class _CartPageState extends State<CartPage> {
   }
 
   void _updateCart(int number, int quantity) async {
-    
     String urlLoadCart = server + "/php/update_cart.php";
-   print('enter update');
+    print('enter update');
 
     http.post(urlLoadCart, body: {
       "email": widget.user.email,
@@ -615,9 +634,9 @@ class _CartPageState extends State<CartPage> {
       print(res.body);
       if (res.body == "success") {
         _loadCart();
-        
       } else {
-        Toast.show("Maximum quantity", context,duration: Toast.LENGTH_LONG,gravity: Toast.BOTTOM);
+        Toast.show("Maximum quantity", context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       }
     }).catchError((err) {
       print(err);
@@ -719,7 +738,7 @@ class _CartPageState extends State<CartPage> {
     }
   }
 
-  void _loadLoc(LatLng loc, newSetState) {
+  void _loadLoc(LatLng loc, newSetState) async {
     newSetState(() {
       print('in setstate');
       markers.clear();
@@ -774,8 +793,12 @@ class _CartPageState extends State<CartPage> {
     gmcontroller.animateCamera(CameraUpdate.newCameraPosition(_home));
   }
 
-  void _deleteCart() async{
-    
+  void _deleteCart() async {
+    if (widget.user.quantity == '0') {
+      Toast.show('No food in cart', context,
+          duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+      return;
+    }
 
     showDialog(
         context: context,
@@ -799,9 +822,7 @@ class _CartPageState extends State<CartPage> {
                         itemCart = null;
                         _amountPayable = 0.00;
                         widget.user.quantity = "0";
-                        setState(() {
-                         
-                        });
+                        setState(() {});
                       } else {
                         Toast.show("Failed", context,
                             duration: Toast.LENGTH_SHORT,
@@ -827,50 +848,47 @@ class _CartPageState extends State<CartPage> {
         _cashOnDelivery = value;
         if (_cashOnDelivery) {
           _credit = false;
-          _updatePayment();
-        } else {
-          _updatePayment();
-        }
+        } else {}
       });
 
-  void _updatePayment() {
+  void _proceedPayment() {
     print(_amountPayable);
     print(_credit);
     setState(() {
-        showDialog(context: context,builder: (context)=>AlertDialog(
-          shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(20.0)),
-              ),
-              title: Text('Confirm your order'),
-              actions: <Widget>[
-                MaterialButton(onPressed: (){},
-
-                child: Text('Yes'),
-
+      showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20.0)),
                 ),
-                MaterialButton(onPressed: (){
-                  Navigator.of(context).pop(false);
-                },
-
-                child: Text('No'),
-                
-                )
-              ],
-        ));
+                title: Text('Confirm your order'),
+                actions: <Widget>[
+                  MaterialButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(false);
+                      makePayment();
+                    },
+                    child: Text('Yes'),
+                  ),
+                  MaterialButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(false);
+                    },
+                    child: Text('No'),
+                  )
+                ],
+              ));
     });
   }
   // Future<void>makePayment
 
-  void _onDeliverCredit(bool value)=>setState(() {
-     _credit = value;
+  void _onDeliverCredit(bool value) => setState(() {
+        _credit = value;
         if (_credit) {
           _cashOnDelivery = false;
-          _updatePayment();
-        } else {
-          _updatePayment();
-        }
+        } else {}
       });
-        String generateOrderid() {
+  String generateOrderid() {
     var now = new DateTime.now();
     var formatter = new DateFormat('ddMMyyyy-');
     String orderid = widget.user.email.substring(1, 4) +
@@ -880,23 +898,40 @@ class _CartPageState extends State<CartPage> {
     return orderid;
   }
 
-  Future<void> _checkOut()async {
-    if(_amountPayable<0){
-      double newamount = _amountPayable*-1;
+  void _updatePayment() {
+    if (_credit) {
+      _amountPayable = _amountPayable - double.parse(widget.user.credit);
+    }
+  }
+
+  Future<void> _payusingCredit(double newamount) async {}
+
+  Future<void> makePayment() async {
+    if (_amountPayable < 0) {
+      double newamount = _amountPayable * -1;
       await _payusingCredit(newamount);
-      
-          }
-          if(_cashOnDelivery){
-            print("COD");
-            Toast.show("Cash On Delivery", context,duration: Toast.LENGTH_SHORT,gravity: Toast.BOTTOM);
-
-          }else {
-            Toast.show("Please select payment option.", context,duration:Toast.LENGTH_LONG,gravity:Toast.BOTTOM);
-
-          }
-          
-        }
-      
-      Future<void>  _payusingCredit(double newamount)async {}
- 
+      _loadCart();
+      return;
+    }
+    if (_cashOnDelivery) {
+      print('COD');
+      Toast.show('Cash On Delivery', context,
+          duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+    }
+    var now = new DateTime.now();
+    var formatter = new DateFormat('ddMMyyyy-');
+    String orderId = widget.user.email.substring(1, 4) +
+        "-" +
+        formatter.format(now) +
+        randomAlphaNumeric(6);
+    print(orderId);
+    await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => PaymentScreen(
+                user: widget.user,
+                val: _totalPrice.toStringAsFixed(2),
+                orderid: orderId)));
+    _loadCart();
+  }
 }
