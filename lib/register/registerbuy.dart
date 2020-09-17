@@ -16,7 +16,6 @@ File _image;
 File file;
 final _picker = ImagePicker();
 
-
 final TextEditingController _namecontroller = TextEditingController();
 final TextEditingController _emcontroller = TextEditingController();
 final TextEditingController _pwcontroller = TextEditingController();
@@ -34,9 +33,6 @@ class RegisterBuyer extends StatefulWidget {
 }
 
 class _RegisterBuyerState extends State<RegisterBuyer> {
-
-
-
   @override
   void initState() {
     super.initState();
@@ -103,14 +99,14 @@ class _RegisterWidgetState extends State<RegisterWidget> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _autoValidate = false;
   String server = "http://lawlietaini.com/hewdeliver";
-    
+
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-      Stack(
+        Stack(
           children: <Widget>[
             Padding(
               padding: EdgeInsets.only(left: 50, right: 50, top: 5),
@@ -262,31 +258,29 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                   title: Text('Camera'),
                   onTap: () async {
                     PickedFile image = await _picker.getImage(
-                      source: ImageSource.camera,
-                      maxHeight: 400,
-                      maxWidth: 300,
-                      imageQuality: 70
-                    );
+                        source: ImageSource.camera,
+                        maxHeight: 400,
+                        maxWidth: 300,
+                        imageQuality: 70);
 
                     setState(() {
-                      _image = File(image.path);
-                      Navigator.pop(context);
-                      
+                       _image = File(image.path);
+                        Navigator.of(context).pop(false);
                     });
-                    ListTile(
-                      leading: Icon(Icons.photo_album),
-                      title: Text('Gallery'),
-                      onTap: () async {
-                      /*  _image = await ImagePicker.pickImage(
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.photo_album),
+                  title: Text('Gallery'),
+                  onTap: () async {
+                    /*  _image = await ImagePicker.pickImage(
                             source: ImageSource.gallery,
                             imageQuality: 80,
                             maxHeight: 450,
                             maxWidth: double.infinity);*/
-                        setState(() {
-                          Navigator.pop(context);
-                        });
-                      },
-                    );
+                    setState(() {
+                      Navigator.pop(context);
+                    });
                   },
                 )
               ],
@@ -296,11 +290,13 @@ class _RegisterWidgetState extends State<RegisterWidget> {
   }
 
   bool _isEmailValid(String email) {
-    return RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(email);
+    return RegExp(
+            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+        .hasMatch(email);
   }
 
-  void _uploadData () {
-   // _validateInput();
+  void _uploadData() {
+    // _validateInput();
     _name = _namecontroller.text;
     _email = _emcontroller.text;
     _password = _pwcontroller.text;
@@ -316,7 +312,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
       pr.show();
 
       print('123');
-     // file = File(_image.path);
+       
       String base64Image = base64Encode(_image.readAsBytesSync());
       http.post(urlUpload, body: {
         "encoded_string": base64Image,
@@ -335,14 +331,18 @@ class _RegisterWidgetState extends State<RegisterWidget> {
         _pwcontroller.text = "";
         _phcontroller.text = "";
         if (res.body == "success") {
-          pr.hide().then((isHidden){
-              print(isHidden);
+          pr.hide().then((isHidden) {
+            print(isHidden);
           });
           pr.hide();
           _showSuccessRegister();
         }
         if (res.body == "failed") {
           print('enter fail area.');
+          pr.hide().then((isHidden) {
+            print(isHidden);
+          });
+          pr.hide();
           _showDialog();
         }
       }).catchError((err) {
@@ -400,6 +400,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
             actions: <Widget>[
               FlatButton(
                 onPressed: () {
+
                   Navigator.of(context).pop();
                 },
                 child: Text('Try another'),
@@ -414,9 +415,9 @@ class _RegisterWidgetState extends State<RegisterWidget> {
           );
         });
   }
+
   void _takePicture() async {
     print('enter take picture');
-   
 
     showModalBottomSheet(
         context: context,
@@ -425,8 +426,6 @@ class _RegisterWidgetState extends State<RegisterWidget> {
             padding: EdgeInsets.all(10),
             child: Wrap(
               children: <Widget>[
-               
-               
                 ListTile(
                   leading: Icon(
                     Icons.camera_front,
@@ -434,20 +433,17 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                   ),
                   title: Text('Take Photo'),
                   onTap: () async {
-                    
                     PickedFile _image = await _picker.getImage(
                       source: ImageSource.camera,
                       maxHeight: 400,
                       maxWidth: 300,
                       imageQuality: 70,
                     );
-                        setState(() {
-                          file = File(_image.path);
-                          
-                          Navigator.of(context).pop(false);
-                          
-                        });
-                  
+                    setState(() {
+                      file = File(_image.path);
+
+                      Navigator.of(context).pop(false);
+                    });
                   },
                 ),
                 Divider(
@@ -462,19 +458,17 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                   ),
                   title: Text('Gallery'),
                   onTap: () async {
-                    
                     PickedFile _image = await _picker.getImage(
                       source: ImageSource.gallery,
                       maxHeight: 400,
                       maxWidth: 300,
                       imageQuality: 70,
                     );
-                    
-                   
                   },
                 )
               ],
             ),
           );
-        });}
+        });
+  }
 }

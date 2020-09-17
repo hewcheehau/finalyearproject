@@ -406,7 +406,8 @@ class _MainPageState extends State<MainPage> {
                                               itemdata[index]['quantity'],
                                               itemdata[index]['available'],
                                               itemdata[index]['foodrating'],
-                                              itemdata[index]['foodtime']),
+                                              itemdata[index]['foodtime'],
+                                              itemdata[index]['foodimage']),
                                           child: Container(
                                             height: screenHeight / 4.5,
                                             width: screenWidth / 1.0,
@@ -415,7 +416,7 @@ class _MainPageState extends State<MainPage> {
                                             child: CachedNetworkImage(
                                               fit: BoxFit.fill,
                                               imageUrl: server +
-                                                  "/images/${itemdata[index]['foodid']}.jpg",
+                                                  "/images/${itemdata[index]['foodimage']}.jpg",
                                               placeholder: (context, url) =>
                                                   new Container(
                                                       height: 50,
@@ -678,7 +679,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   _onFoodDetail(itemdata, itemdata2, itemdata3, itemdata4, itemdata5, itemdata6,
-      itemdata7, itemdata8) {
+      itemdata7, itemdata8,itemdata9) {
     Food food = new Food(
         id: itemdata,
         name: itemdata2,
@@ -687,7 +688,8 @@ class _MainPageState extends State<MainPage> {
         quantity: itemdata5,
         available: itemdata6,
         rating: itemdata7,
-        regdate: itemdata8);
+        regdate: itemdata8,
+        foodimage: itemdata9);
     Navigator.push(
         context,
         MaterialPageRoute(

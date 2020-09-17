@@ -61,7 +61,8 @@ class _FoodDetailState extends State<FoodDetail> {
                         Container(
                           
                           child: CachedNetworkImage(
-                            imageUrl: server + "/images/${widget.food.id}.jpg",
+                            imageUrl: server + "/images/${widget.food.foodimage}.jpg",
+                            fit: BoxFit.cover,
                             placeholder: (context, url) => Center(
                               child: CircularProgressIndicator(),
                             ),
@@ -71,6 +72,8 @@ class _FoodDetailState extends State<FoodDetail> {
                             ),
                           ),
                           height: 300,
+                          width: double.infinity,
+
                         ),
                         Container(
                           height: 250,

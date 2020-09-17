@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fypv1/newfood.dart';
 import 'package:fypv1/tabscreen/tabscreen.dart';
 import 'package:fypv1/tabscreen/transporter.dart';
 import 'package:fypv1/user.dart';
@@ -57,7 +58,7 @@ class _MainScreenState extends State<MainScreen> {
     }else{
        tabs = [
       ProviderScreen(user:widget.user),
-      MapSample(),
+      InsertFood(user: widget.user,),
       ProfileScreen(user: widget.user),
     ];
     }

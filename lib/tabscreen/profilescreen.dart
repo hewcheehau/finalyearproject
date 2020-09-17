@@ -98,10 +98,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             letterSpacing: 1.5)),
                   ),
                   Container(
+                  
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(50),
+                          bottomLeft: Radius.circular(50)
+                        )
+                      ),
                       padding: EdgeInsets.all(12.0),
                       child: Text(
                         widget.user.type,
-                        style: TextStyle(color: Colors.grey[350], fontSize: 25),
+                        style: TextStyle(color: Colors.grey[800], fontSize: 20),
                       ))
                 ],
               ),
@@ -124,7 +132,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           fit: BoxFit.cover,
                           imageUrl:
                               server + "/profile/${widget.user.email}.jpg" ??
-                                  server + "/profile/default.jpg?",
+                                  server + "/profile/unregistered.jpg",
                           imageBuilder: (context, imageProvider) => Container(
                             decoration: BoxDecoration(
                                 image: DecorationImage(
