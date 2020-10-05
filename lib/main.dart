@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fypv1/newfood.dart';
+import 'package:fypv1/tabscreen/orderfood.dart';
 import 'package:fypv1/tabscreen/tabscreen.dart';
 import 'package:fypv1/tabscreen/transporter.dart';
 import 'package:fypv1/user.dart';
@@ -16,9 +17,10 @@ import 'package:progress_dialog/progress_dialog.dart';
 import 'package:async/async.dart';
 import 'dart:convert';
 import 'package:badges/badges.dart';
-import 'package:custom_navigator/custom_navigation.dart';
 import 'tabscreen/trymap.dart';
 import 'tabscreen/provider.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/services.dart';
 
 class MainScreen extends StatefulWidget {
   final User user;
@@ -37,37 +39,49 @@ class _MainScreenState extends State<MainScreen> {
   bool _isVisible = false;
   String server = "http://lawlietaini.com/hewdeliver";
   bool _isEmpty = false;
+  FirebaseMessaging _fcm = FirebaseMessaging();
+  String token1;
+
+  void firebaseListerners() {
+    _fcm.getToken().then((token) {
+      print('Token is ' + token);
+      token1 = token;
+      setState(() {});
+      _loadUser();
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-   
+    firebaseListerners();
+
     print('mainscreen;');
-    if(widget.user.type == 'Food Buyer'||widget.user.type=='unregistered'){
-    tabs = [
-      MainPage(user: widget.user),
-      MapSample(),
-      ProfileScreen(user: widget.user),
-    ];
-    }else if(widget.user.type == 'Transporter'){
-       tabs = [
-      TransporterScreen(user:widget.user),
-      MapSample(),
-      ProfileScreen(user: widget.user),
-    ];
-    }else{
-       tabs = [
-      ProviderScreen(user:widget.user),
-      InsertFood(user: widget.user,),
-      ProfileScreen(user: widget.user),
-    ];
+    if (widget.user.type == 'Food Buyer' ||
+        widget.user.type == 'unregistered') {
+      tabs = [
+        MainPage(user: widget.user),
+        OrderFoodPage(user: widget.user),
+        ProfileScreen(user: widget.user),
+      ];
+    } else if (widget.user.type == 'Transporter') {
+      tabs = [
+        TransporterScreen(user: widget.user),
+        MapSample(),
+        ProfileScreen(user: widget.user),
+      ];
+    } else {
+      tabs = [
+        ProviderScreen(user: widget.user),
+        OrderFoodPage(user: widget.user),
+        ProfileScreen(user: widget.user),
+      ];
     }
   }
 
   String $pagetitle = "Walking-distance";
 
   onTapped(int index) async {
-    
     setState(() {
       currentTabIndex = index;
       print('tap here');
@@ -88,58 +102,66 @@ class _MainScreenState extends State<MainScreen> {
         unselectedItemColor: Colors.blueGrey,
         showSelectedLabels: true,
         showUnselectedLabels: false,
-
         type: BottomNavigationBarType.fixed,
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), title: Text("Home",style: TextStyle(fontWeight: FontWeight.bold),)),
-         /* BottomNavigationBarItem(
-              icon: Badge(
-                showBadge: _isEmpty,
-                badgeContent: Text(count.toString(),
-                    style: TextStyle(color: Colors.white)),
-                child: Icon(MdiIcons.cart),
-              ),
-              title: Text('Cart',style: TextStyle(fontWeight: FontWeight.bold))),*/
-          /*  BottomNavigationBarItem(
-                  icon: new Stack(
-                    children: <Widget>[
-                      new Icon(MdiIcons.cart),
-                      count > 0
-                          ? Visibility(
-                              visible: _isVisible,
-                              child: new Positioned(
-                                right: 0,
-                                child: Container(
-                                    padding: EdgeInsets.all(1),
-                                    decoration: BoxDecoration(
-                                      color: Colors.redAccent,
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    constraints: BoxConstraints(
-                                      minWidth: 13,
-                                      maxHeight: 12,
-                                    ),
-                                    child: new Text(
-                                      "${count}",
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 8),
-                                      textAlign: TextAlign.center,
-                                    )),
-                              ),
-                            )
-                          : Visibility(
-                              visible: false,
-                              child: Container(
-                                child: Text('s'),
-                              ),
-                            )
-                    ],
+          BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              title: Text(
+                "Home",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              )),
+          /* BottomNavigationBarItem(
+                  icon: Badge(
+                    showBadge: _isEmpty,
+                    badgeContent: Text(count.toString(),
+                        style: TextStyle(color: Colors.white)),
+                    child: Icon(MdiIcons.cart),
                   ),
-                  title: Text('Cart')),*/
+                  title: Text('Cart',style: TextStyle(fontWeight: FontWeight.bold))),*/
+          /*  BottomNavigationBarItem(
+                      icon: new Stack(
+                        children: <Widget>[
+                          new Icon(MdiIcons.cart),
+                          count > 0
+                              ? Visibility(
+                                  visible: _isVisible,
+                                  child: new Positioned(
+                                    right: 0,
+                                    child: Container(
+                                        padding: EdgeInsets.all(1),
+                                        decoration: BoxDecoration(
+                                          color: Colors.redAccent,
+                                          borderRadius: BorderRadius.circular(6),
+                                        ),
+                                        constraints: BoxConstraints(
+                                          minWidth: 13,
+                                          maxHeight: 12,
+                                        ),
+                                        child: new Text(
+                                          "${count}",
+                                          style: TextStyle(
+                                              color: Colors.white, fontSize: 8),
+                                          textAlign: TextAlign.center,
+                                        )),
+                                  ),
+                                )
+                              : Visibility(
+                                  visible: false,
+                                  child: Container(
+                                    child: Text('s'),
+                                  ),
+                                )
+                        ],
+                      ),
+                      title: Text('Cart')),*/
           BottomNavigationBarItem(
-              icon: Icon(Icons.directions_walk), title: Text("Delivery",style: TextStyle(fontWeight: FontWeight.bold))),
+              icon: _statusType(),
+              title: Text("Delivery",
+                  style: TextStyle(fontWeight: FontWeight.bold))),
           BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle), title: Text("Profile",style: TextStyle(fontWeight: FontWeight.bold))),
+              icon: Icon(Icons.account_circle),
+              title: Text("Profile",
+                  style: TextStyle(fontWeight: FontWeight.bold))),
         ],
       ),
     );
@@ -203,6 +225,16 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
+  Widget _statusType() {
+    if (widget.user.type == 'Food Buyer') {
+      return Icon(Icons.directions_walk);
+    } else if (widget.user.type == "Transporter") {
+      return Icon(Icons.motorcycle);
+    } else {
+      return Icon(Icons.notification_important);
+    }
+  }
+
   void _loadPref() async {
     int _hold = 0;
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -218,5 +250,28 @@ class _MainScreenState extends State<MainScreen> {
 
   Future init() async {
     this._loadPref();
+  }
+
+  void _loadUser() {
+    print('enter user inform :' + token1);
+
+    if (widget.user.token == null || widget.user.token == '') {
+      widget.user.token = token1;
+
+      http.post(server + "/php/add_token.php", body: {
+        'email': widget.user.email,
+        'token': token1,
+      }).then((res) {
+        if (res.body == 'success') {
+          print('success added token');
+        } else {
+          print('failed add token');
+        }
+      }).catchError((err) {
+        print(err);
+      });
+    } else {
+      print('got token');
+    }
   }
 }

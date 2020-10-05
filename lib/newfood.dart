@@ -308,7 +308,7 @@ class _InsertFoodState extends State<InsertFood> {
                           source: ImageSource.camera,
                           maxHeight: 400,
                           maxWidth: 300,
-                          imageQuality: 70);
+                          imageQuality: 80);
                       setState(() {
                         _image = File(image.path);
                         Navigator.of(context).pop(false);
@@ -324,9 +324,9 @@ class _InsertFoodState extends State<InsertFood> {
                           source: ImageSource.gallery,
                           maxHeight: 400,
                           maxWidth: 300,
-                          imageQuality: 70);
+                          imageQuality: 80);
                       setState(() {
-                        file = File(_image.path);
+                        _image = File(image.path);
                         Navigator.of(context).pop(false);
                       });
                     },

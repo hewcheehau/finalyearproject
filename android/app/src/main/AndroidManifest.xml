@@ -14,10 +14,8 @@
     <application
         android:name="io.flutter.app.FlutterApplication"
         android:label="fypv1"
-        android:usesCleartextTraffic="true"
-        android:icon="@mipmap/ic_launcher">
-
-        
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true">
      
         <activity
             android:name=".MainActivity"
@@ -47,6 +45,10 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+             <intent-filter>
+      <action android:name="FLUTTER_NOTIFICATION_CLICK" />
+      <category android:name="android.intent.category.DEFAULT" />
+  </intent-filter>
         </activity>
          <meta-data android:name="com.google.android.maps.v2.API_KEY" android:value="AIzaSyC6jRt-FqsRx3RI_Q82vDPo4hZyVJkBmBM"/>
      <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version"/>

@@ -17,11 +17,14 @@ import 'package:toast/toast.dart';
 import 'package:fypv1/main.dart';
 import 'package:random_string/random_string.dart';
 import 'package:fypv1/payment.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:fypv1/provider.dart';
+import 'package:fypv1/payable.dart';
 
 class CartPage extends StatefulWidget {
   final User user;
-
-  const CartPage({Key key, this.user}) : super(key: key);
+  final Provider prd;
+  const CartPage({Key key, this.user, this.prd}) : super(key: key);
 
   @override
   _CartPageState createState() => _CartPageState();
@@ -29,10 +32,10 @@ class CartPage extends StatefulWidget {
 
 class _CartPageState extends State<CartPage> {
   GlobalKey<RefreshIndicatorState> refreshKey;
+  final FirebaseMessaging _fcm = FirebaseMessaging();
   String server = "http://lawlietaini.com/hewdeliver";
   List itemCart;
   double screenHeight, screenWidth;
-  bool _payment;
   double _totalPrice, _amountPayable = 0.0;
   String _deliveryCharge = "1.50";
   int cQuantity = 0;
@@ -50,6 +53,29 @@ class _CartPageState extends State<CartPage> {
   bool _checkSelect = true;
   int _countQ = 0;
   String titlecenter = "Loading your cart...";
+  String token1;
+  String _tokenOwner;
+  String _methodpay = "";
+
+  void firebaseListerners() {
+    if (_tokenOwner== null || _tokenOwner == '') {
+      print('no token for provider, and getting now');
+      http.post(server + "/php/get_provider.php",
+          body: {'owner': itemCart[0]['owner']}).then((res) {
+        var extraction = res.body;
+        List extract = extraction.split(',');
+        print('enter take token');
+        if (extract[0] == 'success') {
+          setState(() {
+            _tokenOwner = extract[1];
+            print('the token is :' + _tokenOwner);
+          });
+        } else {
+          print('failed');
+        }
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -58,6 +84,8 @@ class _CartPageState extends State<CartPage> {
     //  refreshKey = GlobalKey<RefreshIndicatorState>();
     _loadCart();
     _getLocation();
+
+    //   getMessage();
   }
 
   @override
@@ -465,7 +493,10 @@ class _CartPageState extends State<CartPage> {
                                               style: TextStyle(fontSize: 18),
                                             )
                                           ],
-                                        )
+                                        ),
+                                        FlatButton(
+                                            onPressed: () => {_getQue()},
+                                            child: Text('send'))
                                       ],
                                     )
                                   ],
@@ -599,7 +630,7 @@ class _CartPageState extends State<CartPage> {
         }
         _amountPayable = _totalPrice + double.parse(_deliveryCharge);
         widget.user.quantity = cQuantity.toString();
-
+        firebaseListerners();
         Future.delayed(Duration(seconds: 1)).then((value) {
           pr.hide().whenComplete(() {
             print(pr.isShowing());
@@ -880,7 +911,6 @@ class _CartPageState extends State<CartPage> {
               ));
     });
   }
-  // Future<void>makePayment
 
   void _onDeliverCredit(bool value) => setState(() {
         _credit = value;
@@ -917,6 +947,10 @@ class _CartPageState extends State<CartPage> {
       print('COD');
       Toast.show('Cash On Delivery', context,
           duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+      _methodpay = "COD";
+    }
+    if (_credit) {
+      _methodpay = "DCP";
     }
     var now = new DateTime.now();
     var formatter = new DateFormat('ddMMyyyy-');
@@ -929,9 +963,52 @@ class _CartPageState extends State<CartPage> {
         context,
         MaterialPageRoute(
             builder: (context) => PaymentScreen(
-                user: widget.user,
-                val: _totalPrice.toStringAsFixed(2),
-                orderid: orderId)));
+                  user: widget.user,
+                  val: _totalPrice.toStringAsFixed(2),
+                  orderid: orderId,
+                  methodpay: _methodpay,
+                  tokenowner: _tokenOwner,
+                )));
+
     _loadCart();
+  }
+
+  Future _getQue() async {
+    print('enter ' + _tokenOwner);
+
+    if (_tokenOwner != null) {
+      var response = await http
+          .post(server + "/php/notify.php", body: {"token": _tokenOwner});
+      print('success');
+      return json.decode(response.body);
+    } else {
+      print("Token is null");
+    }
+  }
+
+  void getMessage() {
+    if (Platform.isIOS) {
+      _fcm.requestNotificationPermissions(IosNotificationSettings());
+    }
+    _fcm.configure(onMessage: (Map<String, dynamic> message) async {
+      print('onMessage: $message');
+      showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+                content: ListTile(
+                  title: Text(message['notification']['title']),
+                  subtitle: Text(message['notification']['body']),
+                ),
+                actions: <Widget>[
+                  FlatButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: Text('Ok'))
+                ],
+              ));
+    }, onLaunch: (Map<String, dynamic> message) async {
+      print('onMessage: $message');
+    }, onResume: (Map<String, dynamic> message) async {
+      print('onMessage: $message');
+    });
   }
 }

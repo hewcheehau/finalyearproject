@@ -15,7 +15,7 @@ import 'package:fypv1/food.dart';
 import 'package:fypv1/food/fooddetail.dart';
 import 'cartpage.dart';
 import 'package:badges/badges.dart';
-
+import 'package:flutter/services.dart';
 
 class MainPage extends StatefulWidget {
   final User user;
@@ -63,6 +63,7 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
     TextEditingController _foodController = new TextEditingController();
@@ -72,18 +73,10 @@ class _MainPageState extends State<MainPage> {
         title: Row(
           children: <Widget>[
             Text(
-          'Today',
+          'TodayFood',
           style: TextStyle(color: Colors.black87,fontSize: 25),
         ),
-         Text(
-          'F',
-          style: TextStyle(color: Colors.blueAccent,fontSize: 25),
-        ),
-        Icon(Icons.fastfood,color:Colors.blueAccent,size:30),
-        Text(
-          'd',
-          style: TextStyle(color: Colors.blueAccent,fontSize: 25),
-        ),
+         
         
           ],
         ),

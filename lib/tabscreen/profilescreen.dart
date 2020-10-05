@@ -14,7 +14,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:material_design_icons_flutter/icon_map.dart';
 import 'profiledetail.dart';
 
 final _picker = ImagePicker();
@@ -100,7 +99,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Container(
                   
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Colors.transparent,
                         borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(50),
                           bottomLeft: Radius.circular(50)
@@ -109,7 +108,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       padding: EdgeInsets.all(12.0),
                       child: Text(
                         widget.user.type,
-                        style: TextStyle(color: Colors.grey[800], fontSize: 20),
+                        style: TextStyle(color: Colors.white, fontSize: 20),
                       ))
                 ],
               ),
@@ -271,11 +270,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            Text(
-                              'Switch Account Type',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold),
+                            Expanded(
+                                                          child: Text(
+                                'Switch Account Type',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
+                              ),
                             ),
                             Icon(
                               Icons.swap_horiz,
@@ -285,7 +286,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                     ),
-                  )
+                  ),
+                
                 ],
               ),
 
@@ -456,8 +458,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ],
           ),
         ),
+         
         Container(
-          margin: EdgeInsets.only(top: 400.0),
+          margin: EdgeInsets.only(top: 450.0),
           decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.only(
@@ -465,7 +468,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   topRight: Radius.circular(20.0))),
         ),
         Container(
-            margin: EdgeInsets.only(top: 350),
+            margin: EdgeInsets.only(top: 380),
             color: Colors.transparent,
             child: CustomScrollView(
               primary: false,

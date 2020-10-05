@@ -112,7 +112,9 @@ class _TabScreenState extends State<TabScreen> {
                                             bottomLeft: Radius.circular(30),
                                           ),
                                           gradient: LinearGradient(
-                                              colors: [
+                                          
+                                          
+                                              /*colors: [
                                                 Colors.lightBlueAccent[400],
                                                 Colors.blueAccent[700]
                                               ],
@@ -120,7 +122,7 @@ class _TabScreenState extends State<TabScreen> {
                                                   1.0, 1.0),
                                               end: const FractionalOffset(
                                                   0.2, 0.2),
-                                              tileMode: TileMode.clamp),
+                                              tileMode: TileMode.clamp*/),
                                         ),
                                       ),
                                       Column(

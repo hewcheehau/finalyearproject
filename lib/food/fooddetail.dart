@@ -37,7 +37,7 @@ class _FoodDetailState extends State<FoodDetail> {
   void initState() {
     super.initState();
     // refreshKey = GlobalKey<RefreshIndicatorState>();
-      _loadData();
+    _loadData();
   }
 
   @override
@@ -59,9 +59,9 @@ class _FoodDetailState extends State<FoodDetail> {
                     Stack(
                       children: <Widget>[
                         Container(
-                          
                           child: CachedNetworkImage(
-                            imageUrl: server + "/images/${widget.food.foodimage}.jpg",
+                            imageUrl:
+                                server + "/images/${widget.food.foodimage}.jpg",
                             fit: BoxFit.cover,
                             placeholder: (context, url) => Center(
                               child: CircularProgressIndicator(),
@@ -73,7 +73,6 @@ class _FoodDetailState extends State<FoodDetail> {
                           ),
                           height: 300,
                           width: double.infinity,
-
                         ),
                         Container(
                           height: 250,
@@ -82,6 +81,7 @@ class _FoodDetailState extends State<FoodDetail> {
                               gradient: LinearGradient(
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter,
+                                  
                                   colors: [
                                 const Color(0xCC000000),
                                 const Color(0x00000000),
@@ -93,28 +93,35 @@ class _FoodDetailState extends State<FoodDetail> {
                           right: 0.0,
                           left: 0.0,
                           child: AppBar(
-                            leading: IconButton(icon: Icon(Icons.arrow_back), onPressed: (){
-                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>MainScreen(user:widget.user)));
-                            }),
-                            iconTheme: IconThemeData(
-                              color: Colors.white,
-                              size: 25
-                            ),
+                            leading: IconButton(
+                                icon: Icon(Icons.arrow_back),
+                                onPressed: () {
+                                  Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              MainScreen(user: widget.user)));
+                                }),
+                            iconTheme:
+                                IconThemeData(color: Colors.white, size: 25),
                             centerTitle: true,
-                            title: Text(widget.food.name,style: TextStyle(fontSize: 25),maxLines: 3,),
+                            title: Text(
+                              widget.food.name,
+                              style: TextStyle(fontSize: 25),
+                              maxLines: 3,
+                            ),
                             backgroundColor: Colors.transparent,
                             elevation: 0.0,
                           ),
                         ),
                       ],
                     ),
-                     Padding(
+                    Padding(
                       padding: EdgeInsets.all(0.0),
                       child: Column(
                         children: <Widget>[
-                          
                           Container(
-                            height: screenHeight/2,
+                            height: screenHeight / 2,
                             child: Card(
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20)),
@@ -139,11 +146,11 @@ class _FoodDetailState extends State<FoodDetail> {
                                                       color: Colors.blueGrey,
                                                       fontWeight:
                                                           FontWeight.bold,
-                                                          fontSize: 18),
-                                                          
+                                                      fontSize: 18),
                                                 ),
                                               ),
-                                              Icon(Icons.home, color: Colors.blueAccent)
+                                              Icon(Icons.home,
+                                                  color: Colors.blueAccent)
                                             ],
                                           ),
                                           Text(
@@ -154,114 +161,140 @@ class _FoodDetailState extends State<FoodDetail> {
                                         ],
                                       ),
                                       SizedBox(height: 20),
-                                      Divider(
-
-                                      ),
+                                      Divider(),
                                       Column(
-                                        
-                                           children: [
-                                if (widget.food.rating == '1') ...[
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: <Widget>[
-                                      Text(
-                                        'Review: ',
-                                        style: TextStyle(color: Colors.black87),
+                                        children: [
+                                          if (widget.food.rating == '1') ...[
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: <Widget>[
+                                                Text(
+                                                  'Review: ',
+                                                  style: TextStyle(
+                                                      color: Colors.black87),
+                                                ),
+                                                Icon(Icons.star,
+                                                    color: Colors.amber),
+                                                Icon(Icons.star_border,
+                                                    color: Colors.amber),
+                                                Icon(Icons.star_border,
+                                                    color: Colors.amber),
+                                                Icon(Icons.star_border,
+                                                    color: Colors.amber),
+                                                Icon(Icons.star_border,
+                                                    color: Colors.amber),
+                                              ],
+                                            ),
+                                          ] else if (widget.food.rating ==
+                                              '2') ...[
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: <Widget>[
+                                                Text(
+                                                  'Review: ',
+                                                  style: TextStyle(
+                                                      color: Colors.black87),
+                                                ),
+                                                Icon(Icons.star,
+                                                    color: Colors.amber),
+                                                Icon(Icons.star,
+                                                    color: Colors.amber),
+                                                Icon(Icons.star_border,
+                                                    color: Colors.amber),
+                                                Icon(Icons.star_border,
+                                                    color: Colors.amber),
+                                              ],
+                                            ),
+                                          ] else if (widget.food.rating ==
+                                              '3') ...[
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: <Widget>[
+                                                Text(
+                                                  'Review: ',
+                                                  style: TextStyle(
+                                                      color: Colors.black87),
+                                                ),
+                                                Icon(Icons.star,
+                                                    color: Colors.amber),
+                                                Icon(Icons.star,
+                                                    color: Colors.amber),
+                                                Icon(Icons.star_border,
+                                                    color: Colors.amber),
+                                                Icon(Icons.star_border,
+                                                    color: Colors.amber),
+                                              ],
+                                            ),
+                                          ] else if (widget.food.rating ==
+                                              '4') ...[
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: <Widget>[
+                                                Text(
+                                                  'Review: ',
+                                                  style: TextStyle(
+                                                      color: Colors.black87,
+                                                      fontSize: 20),
+                                                ),
+                                                Icon(Icons.star,
+                                                    color: Colors.amber),
+                                                Icon(Icons.star,
+                                                    color: Colors.amber),
+                                                Icon(Icons.star,
+                                                    color: Colors.amber),
+                                                Icon(Icons.star,
+                                                    color: Colors.amber),
+                                                Icon(
+                                                  Icons.star_border,
+                                                  color: Colors.amber,
+                                                )
+                                              ],
+                                            ),
+                                          ] else ...[
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: <Widget>[
+                                                Text(
+                                                  'Review: ',
+                                                  style: TextStyle(
+                                                      color: Colors.black87),
+                                                ),
+                                                Icon(Icons.star,
+                                                    color: Colors.amber),
+                                                Icon(Icons.star,
+                                                    color: Colors.amber),
+                                                Icon(Icons.star,
+                                                    color: Colors.amber),
+                                                Icon(Icons.star,
+                                                    color: Colors.amber),
+                                                Icon(Icons.star,
+                                                    color: Colors.amber)
+                                              ],
+                                            ),
+                                          ]
+                                        ],
                                       ),
-                                      Icon(Icons.star, color: Colors.amber),
-                                      Icon(Icons.star_border,
-                                          color: Colors.amber),
-                                      Icon(Icons.star_border,
-                                          color: Colors.amber),
-                                      Icon(Icons.star_border,
-                                          color: Colors.amber),
-                                      Icon(Icons.star_border,
-                                          color: Colors.amber),
-                                    ],
-                                  ),
-                                ] else if (widget.food.rating == '2') ...[
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: <Widget>[
-                                      Text(
-                                        'Review: ',
-                                        style: TextStyle(color: Colors.black87),
+                                      SizedBox(
+                                        height: 10,
                                       ),
-                                      Icon(Icons.star, color: Colors.amber),
-                                      Icon(Icons.star, color: Colors.amber),
-                                      Icon(Icons.star_border,
-                                          color: Colors.amber),
-                                      Icon(Icons.star_border,
-                                          color: Colors.amber),
-                                    ],
-                                  ),
-                                ] else if (widget.food.rating == '3') ...[
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: <Widget>[
-                                      Text(
-                                        'Review: ',
-                                        style: TextStyle(color: Colors.black87),
-                                      ),
-                                      Icon(Icons.star, color: Colors.amber),
-                                      Icon(Icons.star, color: Colors.amber),
-                                      Icon(Icons.star_border,
-                                          color: Colors.amber),
-                                      Icon(Icons.star_border,
-                                          color: Colors.amber),
-                                    ],
-                                  ),
-                                ] else if (widget.food.rating == '4') ...[
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: <Widget>[
-                                      Text(
-                                        'Review: ',
-                                        style: TextStyle(
-                                            color: Colors.black87, fontSize: 20),
-                                      ),
-                                      Icon(Icons.star, color: Colors.amber),
-                                      Icon(Icons.star, color: Colors.amber),
-                                      Icon(Icons.star, color: Colors.amber),
-                                      Icon(Icons.star, color: Colors.amber),
-                                      Icon(
-                                        Icons.star_border,
-                                        color: Colors.amber,
-                                      )
-                                    ],
-                                  ),
-                                ] else ...[
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: <Widget>[
-                                      Text(
-                                        'Review: ',
-                                        style: TextStyle(color: Colors.black87),
-                                      ),
-                                      Icon(Icons.star, color: Colors.amber),
-                                      Icon(Icons.star, color: Colors.amber),
-                                      Icon(Icons.star, color: Colors.amber),
-                                      Icon(Icons.star, color: Colors.amber),
-                                      Icon(Icons.star, color: Colors.amber)
-                                    ],
-                                  ),
-                                ]
-                              ],
-                                      ),
-                                      SizedBox(height: 10,),
                                       Container(
                                           alignment: Alignment.topLeft,
                                           child: Text(
                                               'Include: 1x' + widget.food.name,
-                                              style:
-                                                  TextStyle(color: Colors.grey))),
+                                              style: TextStyle(
+                                                  color: Colors.grey))),
                                       SizedBox(height: 10),
                                       Container(
                                           alignment: Alignment.topLeft,
                                           child: Text(
                                               'Location: ' + widget.food.name,
-                                              style:
-                                                  TextStyle(color: Colors.grey))),
+                                              style: TextStyle(
+                                                  color: Colors.grey))),
                                       SizedBox(height: 10),
                                       Container(
                                           alignment: Alignment.topLeft,
@@ -277,7 +310,6 @@ class _FoodDetailState extends State<FoodDetail> {
                         ],
                       ),
                     ),
-                   
                   ],
                 ),
               ),
@@ -286,7 +318,6 @@ class _FoodDetailState extends State<FoodDetail> {
               padding: const EdgeInsets.fromLTRB(10, 0, 10, 30),
               child: Container(
                 decoration: BoxDecoration(
-                  
                   shape: BoxShape.rectangle,
                 ),
                 alignment: Alignment.center,
@@ -332,8 +363,7 @@ class _FoodDetailState extends State<FoodDetail> {
                         Expanded(
                           child: MaterialButton(
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10)
-                            ),
+                                borderRadius: BorderRadius.circular(10)),
                             height: screenHeight / 12,
                             minWidth: screenWidth / 1.8,
                             onPressed: () {
@@ -344,7 +374,10 @@ class _FoodDetailState extends State<FoodDetail> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: <Widget>[
-                                Icon(Icons.shopping_basket,color: Colors.white,),
+                                Icon(
+                                  Icons.shopping_basket,
+                                  color: Colors.white,
+                                ),
                                 Text(
                                   'ADD TO CART',
                                   style: TextStyle(
@@ -393,8 +426,9 @@ class _FoodDetailState extends State<FoodDetail> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setInt("cquantity", 0);
     _foodid = (prefs.getString("foodid"));
-    
-    if (widget.user.email == "unregister@hewdeliver.com"||widget.user.name == 'unregistered') {
+
+    if (widget.user.email == "unregister@hewdeliver.com" ||
+        widget.user.name == 'unregistered') {
       Toast.show("Please Register/Login.", context,
           duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       return;
@@ -484,7 +518,8 @@ class _FoodDetailState extends State<FoodDetail> {
   }
 
   void _clearCartDialog(String _foodid) {
-    if ((int.parse(widget.user.quantity)+quantity >= int.parse(widget.food.quantity)) &&
+    if ((int.parse(widget.user.quantity) + quantity >=
+            int.parse(widget.food.quantity)) &&
         (_foodid == widget.food.id)) {
       showDialog(
           context: context,

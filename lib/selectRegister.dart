@@ -96,11 +96,13 @@ class _SelectAccountTypeState extends State<SelectAccountType> {
                           padding: EdgeInsets.fromLTRB(50, 15, 50, 15),
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
-                              gradient: LinearGradient(colors: <Color>[
+                              gradient: LinearGradient(
+                                colors: <Color>[
                                 Color(0xFF0D47A1),
                                 Color(0xFF1976D2),
                                 Color(0xFF42A5F5),
-                              ])),
+                              ]
+                              )),
                           child: Text('Next', style: TextStyle(fontSize: 20)),
                         ),
                       ),

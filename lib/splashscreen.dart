@@ -53,7 +53,7 @@ class _ProgressIndicatorState extends State<ProgressIndicator>
   void initState() {
     super.initState();
     controller = AnimationController(
-        duration: const Duration(milliseconds: 2000), vsync: this);
+        duration: const Duration(milliseconds: 2000),vsync: this );
     animation = Tween(begin: 0.0, end: 1.0).animate(controller)
       ..addListener(() {
         setState(() {
@@ -77,7 +77,7 @@ class _ProgressIndicatorState extends State<ProgressIndicator>
     return Center(
       child: new CircularProgressIndicator(
         value: animation.value,
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.transparent,
         valueColor: new AlwaysStoppedAnimation<Color>(Colors.blue),
       ),
     );
@@ -109,6 +109,9 @@ class _ProgressIndicatorState extends State<ProgressIndicator>
   }
 
   bool _isEmailValid(String email) {
+    if(email==null){
+      return false;
+    }
     return RegExp(
             r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
         .hasMatch(email);
@@ -133,7 +136,9 @@ class _ProgressIndicatorState extends State<ProgressIndicator>
             credit: extract[5],
             datereg: extract[6],
             address: extract[7],
-            quantity: "0");
+            quantity: "0",
+            token: extract[8]);
+            
         Navigator.pushReplacement(
             ctx,
             MaterialPageRoute(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fypv1/tabscreen/trymap.dart';
 import 'package:fypv1/user.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:async';
@@ -9,6 +10,8 @@ import 'dart:convert';
 import 'package:toast/toast.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:fypv1/newproduct.dart';
+import 'package:fypv1/food.dart';
+import 'package:fypv1/food/foodseller.dart';
 
 final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
 String _currentAddress = "Searching your current location";
@@ -49,7 +52,6 @@ class _ProviderScreenState extends State<ProviderScreen> {
     refreshKey = GlobalKey<RefreshIndicatorState>();
     _getCurrentLocation();
     _loadData();
-    
   }
 
   @override
@@ -224,89 +226,90 @@ class _ProviderScreenState extends State<ProviderScreen> {
                                                 BorderRadius.circular(5)),
                                         child: Padding(
                                           padding: EdgeInsets.all(0.0),
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: <Widget>[
-                                              Expanded(
-                                                child: InkWell(
-                                                  onLongPress: _onDeleteItem,
-                                                  child: Container(
-                                                    height: screenHeight / 4.5,
-                                                    width: screenWidth / 1.0,
-                                                    decoration: BoxDecoration(
-                                                        shape:
-                                                            BoxShape.rectangle),
-                                                    child: CachedNetworkImage(
-                                                      imageUrl: server +
-                                                          "/images/${itemdata[index]['foodimage']}.jpg",
-                                                      placeholder:
-                                                          (context, url) =>
-                                                              new Container(
-                                                        height: 50,
-                                                        width: 50,
-                                                        child: Center(
-                                                          child:
-                                                              CircularProgressIndicator(),
+                                          child: InkWell(
+                                            onTap: ()=>{_onfoodselldetail(itemdata[index]['foodid'],itemdata[index]['foodname'],itemdata[index]['foodshop'],itemdata[index]['price'],itemdata[index]['quantity'],itemdata[index]['available'],itemdata[index]['foodrating'],itemdata[index]['fooddate'],itemdata[index]['foodimage'],itemdata[index]['description'])},
+                                              onLongPress: _onDeleteItem,                                    child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: <Widget>[
+                                                Expanded(
+                                                  child:Container(
+                                                      height: screenHeight / 4.5,
+                                                      width: screenWidth / 1.0,
+                                                      decoration: BoxDecoration(
+                                                          shape:
+                                                              BoxShape.rectangle),
+                                                      child: CachedNetworkImage(
+                                                        imageUrl: server +
+                                                            "/images/${itemdata[index]['foodimage']}.jpg",
+                                                        placeholder:
+                                                            (context, url) =>
+                                                                new Container(
+                                                          height: 50,
+                                                          width: 50,
+                                                          child: Center(
+                                                            child:
+                                                                CircularProgressIndicator(),
+                                                          ),
+                                                        ),
+                                                        errorWidget: (context,
+                                                                url, error) =>
+                                                            new Icon(Icons.error),
+                                                        imageBuilder: (context,
+                                                                imageProvider) =>
+                                                            Container(
+                                                          decoration:
+                                                              BoxDecoration(
+                                                                  image:
+                                                                      DecorationImage(
+                                                                    image:
+                                                                        imageProvider,
+                                                                    fit: BoxFit
+                                                                        .cover,
+                                                                  ),
+                                                                  shape: BoxShape
+                                                                      .rectangle),
                                                         ),
                                                       ),
-                                                      errorWidget: (context,
-                                                              url, error) =>
-                                                          new Icon(Icons.error),
-                                                      imageBuilder: (context,
-                                                              imageProvider) =>
-                                                          Container(
-                                                        decoration:
-                                                            BoxDecoration(
-                                                                image:
-                                                                    DecorationImage(
-                                                                  image:
-                                                                      imageProvider,
-                                                                  fit: BoxFit
-                                                                      .cover,
-                                                                ),
-                                                                shape: BoxShape
-                                                                    .rectangle),
-                                                      ),
                                                     ),
+                                                  
+                                                ),
+                                                Align(
+                                                  alignment: Alignment.topLeft,
+                                                  child: Text(
+                                                    'Name:',
+                                                    style: TextStyle(
+                                                        color: Colors.grey),
                                                   ),
                                                 ),
-                                              ),
-                                              Align(
-                                                alignment: Alignment.topLeft,
-                                                child: Text(
-                                                  'Name:',
-                                                  style: TextStyle(
-                                                      color: Colors.grey),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(5.0),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: <Widget>[
+                                                      Text(
+                                                          itemdata[index]
+                                                              ['foodname'],
+                                                          maxLines: 2,
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight.w600,
+                                                              fontSize: 18)),
+                                                      Text(
+                                                          'RM ${itemdata[index]['price']}',
+                                                          style: TextStyle(
+                                                              fontSize: 18))
+                                                    ],
+                                                  ),
                                                 ),
-                                              ),
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.all(5.0),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: <Widget>[
-                                                    Text(
-                                                        itemdata[index]
-                                                            ['foodname'],
-                                                        maxLines: 2,
-                                                        style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                            fontSize: 18)),
-                                                    Text(
-                                                        'RM ${itemdata[index]['price']}',
-                                                        style: TextStyle(
-                                                            fontSize: 18))
-                                                  ],
+                                                SizedBox(
+                                                  height: 5,
                                                 ),
-                                              ),
-                                              SizedBox(
-                                                height: 5,
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -384,174 +387,178 @@ class _ProviderScreenState extends State<ProviderScreen> {
         setState(() {
           var extractdata = json.decode(res.body);
           itemdata = extractdata["food"];
-         
-          _sortList();
-               
-                  });
-                }
-              }).catchError((err) {
-                print(err);
-              });
-            }
-          
-            void _onDeleteItem() {}
-          
-            _chooseAvailablefood() {
-              showDialog(
-                  context: context,
-                  builder: (
-                    BuildContext context,
-                  ) =>
-                      StatefulBuilder(builder: (context, setState) {
-                        return SimpleDialog(
-                          title: Text(
-                            'Select available food',
-                            style: TextStyle(),
-                          ),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0)),
-                          contentPadding: EdgeInsets.fromLTRB(5, 8, 5, 8),
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  Text(
-                                    'Food Product',
-                                    style: TextStyle(
-                                        color: Colors.black, fontWeight: FontWeight.bold),
-                                  ),
-                                  Text('Set Available',
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold))
-                                ],
-                              ),
-                            ),
-                            Divider(
-                              color: Colors.grey,
-                              height: 10,
-                            ),
-                            Container(
-                              height: 200,
-                              width: 200,
-                              child: ListView.builder(
-                                  padding: EdgeInsets.all(0),
-                                  itemCount: itemdata.length,
-                                  itemBuilder: (context, index) {
-                                    return Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Container(
-                                          child: Column(
-                                        children: <Widget>[
-                                          Table(
-                                            children: [
-                                              TableRow(children: [
-                                                TableCell(
-                                                    child: Container(
-                                                  padding: EdgeInsets.all(15.0),
-                                                  child: Text(
-                                                      "${itemdata[index]['foodname']}"),
-                                                )),
-                                                TableCell(
-                                                    child: Container(
-                                                        child: CheckboxListTile(
-                                                            value: listcheck[index],
-                                                            onChanged: (bool newValue) {  
-                                                              setState(() {
-                                                                _checkAvailable(
-                                                                    newValue, index);
-                                                                  listcheck[index] = newValue; 
-                                                              });
-                                                            })))
-                                              ])
-                                            ],
-                                          )
-                                        ],
-                                      )),
-                                    );
-                                  }),
-                            )
-                          ],
-                        );
-                      }));
-            }
-          
-            Widget radioButton(bool isSelected) {
-              setState(() {});
-              return Container(
-                  width: 16.0,
-                  height: 16.0,
-                  padding: EdgeInsets.all(2.0),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(width: 2.0, color: Colors.black),
-                  ),
-                  child: isSelected
-                      ? Container(
-                          width: double.infinity,
-                          height: double.infinity,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.green,
-                          ),
-                        )
-                      : Container());
-            }
-          
-            void _checkAvailable(bool newValue, int n) {
-              String setfood;
-              if (newValue) {
-                setfood = "1";
-                print(setfood);
-              } else {
-                setfood = "0";
-                print(setfood);
-              }
-              setState(() {
-                http.post(server + "/php/update_food.php", body: {
-                  'id': itemdata[n]['foodid'],
-                  'setfood': setfood,
-                  'email': widget.user.email
-                }).then((res) {
-                  print(res.body);
-                  if (res.body == "nodata") {
-                    Toast.show('failed', context,
-                        duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-                  } else {
-                    print('ess');
-                    _loadData();
-                   
-                  
-                  }
-                });
-              });
-            }
-          
-            bool _isAvailablefood(int index) {
-              if (itemdata[index]['available'] == '1') {
-                // listcheck[index] = true;
-                return _isSelected;
-              } else if (itemdata[index]['available'] == '0') {
-                //  listcheck[index] = false;
-                return _isAvailable;
-              }
-            }
-          
-            void _onCheck(bool newValue) => setState(() {
-                  _isAvailable = newValue;
-                });
-          
-            void _sortList() {
-              listcheck.length = itemdata.length;
-              for(int i=0; i<itemdata.length; i++){
-                if(itemdata[i]['available']=='1'){
-                  listcheck[i] = true;
-                }else{
-                  listcheck[i] = false;
-                }
-              }
 
-            }
+          _sortList();
+        });
+      }
+    }).catchError((err) {
+      print(err);
+    });
+  }
+
+  void _onDeleteItem() {}
+
+  _chooseAvailablefood() {
+    showDialog(
+        context: context,
+        builder: (
+          BuildContext context,
+        ) =>
+            StatefulBuilder(builder: (context, setState) {
+              return SimpleDialog(
+                title: Text(
+                  'Select available food',
+                  style: TextStyle(),
+                ),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0)),
+                contentPadding: EdgeInsets.fromLTRB(5, 8, 5, 8),
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text(
+                          'Food Product',
+                          style: TextStyle(
+                              color: Colors.black, fontWeight: FontWeight.bold),
+                        ),
+                        Text('Set Available',
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold))
+                      ],
+                    ),
+                  ),
+                  Divider(
+                    color: Colors.grey,
+                    height: 10,
+                  ),
+                  Container(
+                    height: 200,
+                    width: 200,
+                    child: ListView.builder(
+                        padding: EdgeInsets.all(0),
+                        itemCount: itemdata.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                                child: Column(
+                              children: <Widget>[
+                                Table(
+                                  children: [
+                                    TableRow(children: [
+                                      TableCell(
+                                          child: Container(
+                                        padding: EdgeInsets.all(15.0),
+                                        child: Text(
+                                            "${itemdata[index]['foodname']}"),
+                                      )),
+                                      TableCell(
+                                          child: Container(
+                                              child: CheckboxListTile(
+                                                  value: listcheck[index],
+                                                  onChanged: (bool newValue) {
+                                                    setState(() {
+                                                      _checkAvailable(
+                                                          newValue, index);
+                                                      listcheck[index] =
+                                                          newValue;
+                                                    });
+                                                  })))
+                                    ])
+                                  ],
+                                ),
+                              ],
+                            )),
+                          );
+                        }),
+                  ),
+                  OutlineButton.icon(
+                    onPressed: () => {Navigator.of(context).pop(false)},
+                    icon: Icon(Icons.done),
+                    label: Text('Finish edit'),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50)),
+                  )
+                ],
+              );
+            }));
+  }
+
+  Widget radioButton(bool isSelected) {
+    setState(() {});
+    return Container(
+        width: 16.0,
+        height: 16.0,
+        padding: EdgeInsets.all(2.0),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(width: 2.0, color: Colors.black),
+        ),
+        child: isSelected
+            ? Container(
+                width: double.infinity,
+                height: double.infinity,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.green,
+                ),
+              )
+            : Container());
+  }
+
+  void _checkAvailable(bool newValue, int n) {
+    String setfood;
+    if (newValue) {
+      setfood = "1";
+      print(setfood);
+    } else {
+      setfood = "0";
+      print(setfood);
+    }
+    setState(() {
+      http.post(server + "/php/update_food.php", body: {
+        'id': itemdata[n]['foodid'],
+        'setfood': setfood,
+        'email': widget.user.email
+      }).then((res) {
+        print(res.body);
+        if (res.body == "nodata") {
+          Toast.show('failed', context,
+              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+        } else {
+          print('ess');
+          _loadData();
+        }
+      });
+    });
+  }
+
+  void _sortList() {
+    listcheck.length = itemdata.length;
+    for (int i = 0; i < itemdata.length; i++) {
+      if (itemdata[i]['available'] == '1') {
+        listcheck[i] = true;
+      } else {
+        listcheck[i] = false;
+      }
+    }
+  }
+
+  _onfoodselldetail(n, n1, n2, n3, n4, n5, n6, n7, n8,n9) {
+    Food food = new Food(
+        id: n,
+        name: n1,
+        shopname: n2,
+        price: n3,
+        quantity: n4,
+        available: n5,
+        rating: n6,
+        regdate: n7,
+        foodimage: n8);
+  Navigator.push(context, MaterialPageRoute(builder: (context)=>FoodSellDetail(user:widget.user,food:food)));
+  }
 }

@@ -68,6 +68,20 @@ class _ProfileDetailState extends State<ProfileDetail> {
             children: <Widget>[
               Container(
                 height: 50,
+               // padding: EdgeInsets.fromLTRB(15, 0, 15, 0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                
+                  Expanded(
+                    child: Text(widget.user.email,style: TextStyle(fontWeight:FontWeight.bold),)),
+                  Flexible(
+                   
+                    child: Icon(Icons.verified_outlined,color: Colors.blue,))
+                ],),
+              ),
+              Container(
+                height: 50,
                 padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
                 child: InkWell(
                   onTap: _changeName,

@@ -295,10 +295,12 @@ class _NewFoodState extends State<NewFood> {
                           source: ImageSource.camera,
                           maxHeight: 400,
                           maxWidth: 300,
-                          imageQuality: 70);
+                          imageQuality: 80);
 
                       setState(() {
+                        if(image!=null){
                         _image = File(image.path);
+                        }
                         //   _cropImage();
                         Navigator.of(context).pop(false);
                       });
@@ -313,9 +315,11 @@ class _NewFoodState extends State<NewFood> {
                           source: ImageSource.gallery,
                           maxHeight: 400,
                           maxWidth: 300,
-                          imageQuality: 70);
+                          imageQuality: 80);
                       setState(() {
-                        _image = File(_image.path);
+                        if(image!=null){
+                        _image = File(image.path);
+                        }
                         Navigator.of(context).pop(false);
                       });
                     },
@@ -336,7 +340,6 @@ class _NewFoodState extends State<NewFood> {
       "fname": fname.text,
       "fshop": faddress.text,
       "ftype": ftype.text,
-      "faddress": faddress.text,
       "price": fprice.text,
       "quantity": fquantity.text,
     }).then((res) {
