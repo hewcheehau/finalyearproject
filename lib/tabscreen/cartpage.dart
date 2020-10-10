@@ -19,7 +19,7 @@ import 'package:random_string/random_string.dart';
 import 'package:fypv1/payment.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:fypv1/provider.dart';
-import 'package:fypv1/payable.dart';
+
 
 class CartPage extends StatefulWidget {
   final User user;
@@ -58,7 +58,7 @@ class _CartPageState extends State<CartPage> {
   String _methodpay = "";
 
   void firebaseListerners() {
-    if (_tokenOwner== null || _tokenOwner == '') {
+    if (_tokenOwner == null || _tokenOwner == '') {
       print('no token for provider, and getting now');
       http.post(server + "/php/get_provider.php",
           body: {'owner': itemCart[0]['owner']}).then((res) {
@@ -495,7 +495,7 @@ class _CartPageState extends State<CartPage> {
                                           ],
                                         ),
                                         FlatButton(
-                                            onPressed: () => {_getQue()},
+                                           // onPressed: () => {_getQue()},
                                             child: Text('send'))
                                       ],
                                     )
@@ -964,7 +964,7 @@ class _CartPageState extends State<CartPage> {
         MaterialPageRoute(
             builder: (context) => PaymentScreen(
                   user: widget.user,
-                  val: _totalPrice.toStringAsFixed(2),
+                  val: _amountPayable.toStringAsFixed(2),
                   orderid: orderId,
                   methodpay: _methodpay,
                   tokenowner: _tokenOwner,
@@ -973,42 +973,8 @@ class _CartPageState extends State<CartPage> {
     _loadCart();
   }
 
-  Future _getQue() async {
-    print('enter ' + _tokenOwner);
 
-    if (_tokenOwner != null) {
-      var response = await http
-          .post(server + "/php/notify.php", body: {"token": _tokenOwner});
-      print('success');
-      return json.decode(response.body);
-    } else {
-      print("Token is null");
-    }
   }
 
-  void getMessage() {
-    if (Platform.isIOS) {
-      _fcm.requestNotificationPermissions(IosNotificationSettings());
-    }
-    _fcm.configure(onMessage: (Map<String, dynamic> message) async {
-      print('onMessage: $message');
-      showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-                content: ListTile(
-                  title: Text(message['notification']['title']),
-                  subtitle: Text(message['notification']['body']),
-                ),
-                actions: <Widget>[
-                  FlatButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: Text('Ok'))
-                ],
-              ));
-    }, onLaunch: (Map<String, dynamic> message) async {
-      print('onMessage: $message');
-    }, onResume: (Map<String, dynamic> message) async {
-      print('onMessage: $message');
-    });
-  }
-}
+ 
+

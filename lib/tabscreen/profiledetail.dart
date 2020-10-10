@@ -7,7 +7,6 @@ import 'profilescreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fypv1/login.dart';
 
-
 String titleCase(String text) {
   if (text == null) throw ArgumentError("string: $text");
 
@@ -68,17 +67,22 @@ class _ProfileDetailState extends State<ProfileDetail> {
             children: <Widget>[
               Container(
                 height: 50,
-               // padding: EdgeInsets.fromLTRB(15, 0, 15, 0),
+                // padding: EdgeInsets.fromLTRB(15, 0, 15, 0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                
-                  Expanded(
-                    child: Text(widget.user.email,style: TextStyle(fontWeight:FontWeight.bold),)),
-                  Flexible(
-                   
-                    child: Icon(Icons.verified_outlined,color: Colors.blue,))
-                ],),
+                    Expanded(
+                        child: Text(
+                      widget.user.email,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    )),
+                    Flexible(
+                        child: Icon(
+                      Icons.verified_outlined,
+                      color: Colors.blue,
+                    ))
+                  ],
+                ),
               ),
               Container(
                 height: 50,
@@ -203,6 +207,11 @@ class _ProfileDetailState extends State<ProfileDetail> {
                           duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
                       return;
                     }
+                    if (!isValidPhone(_ph.text)) {
+                      Toast.show("Invalid phone format", context,
+                          duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+                      return;
+                    }
                     http.post(server + "/php/update_profile.php", body: {
                       "email": widget.user.email,
                       "phone": _ph.text,
@@ -290,7 +299,6 @@ class _ProfileDetailState extends State<ProfileDetail> {
   }
 
   void _changePassword() {
-    
     TextEditingController _pass1 = new TextEditingController();
     TextEditingController _pass2 = new TextEditingController();
     showDialog(
@@ -337,7 +345,7 @@ class _ProfileDetailState extends State<ProfileDetail> {
             ));
   }
 
-  _updatePassword(String pass1, String pass2) async{
+  _updatePassword(String pass1, String pass2) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (pass1 == "" || pass2 == "") {
       Toast.show('Please enter your password', context,
@@ -356,10 +364,11 @@ class _ProfileDetailState extends State<ProfileDetail> {
         setState(() {});
         Toast.show('Success changed', context,
             duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
-            prefs.setString('email', '');
-            prefs.setString('pass', '');
-            Navigator.of(context).pop();
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>LoginScreen()));
+        prefs.setString('email', '');
+        prefs.setString('pass', '');
+        Navigator.of(context).pop();
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => LoginScreen()));
         return;
       } else {
         Toast.show('Failed to change.', context,
@@ -414,7 +423,9 @@ class _ProfileDetailState extends State<ProfileDetail> {
                           setState(() {
                             widget.user.address = _address.text;
                           });
-                          Toast.show('Success changed.', context,duration: Toast.LENGTH_LONG,gravity: Toast.BOTTOM);
+                          Toast.show('Success changed.', context,
+                              duration: Toast.LENGTH_LONG,
+                              gravity: Toast.BOTTOM);
                           Navigator.of(context).pop();
                           return;
                         } else {}
@@ -428,5 +439,9 @@ class _ProfileDetailState extends State<ProfileDetail> {
                     child: Text('Back'))
               ],
             ));
+  }
+
+  bool isValidPhone(String phone) {
+    return RegExp(r"^0\d{9,10}").hasMatch(phone);
   }
 }

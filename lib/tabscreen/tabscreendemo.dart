@@ -400,7 +400,8 @@ class _MainPageState extends State<MainPage> {
                                               itemdata[index]['available'],
                                               itemdata[index]['foodrating'],
                                               itemdata[index]['foodtime'],
-                                              itemdata[index]['foodimage']),
+                                              itemdata[index]['foodimage'],
+                                              itemdata[index]['foodowner']),
                                           child: Container(
                                             height: screenHeight / 4.5,
                                             width: screenWidth / 1.0,
@@ -434,16 +435,26 @@ class _MainPageState extends State<MainPage> {
                                             ),
                                           ),
                                         ),
-                                      Text(
-                                              itemdata[index]['foodname'],
-                                              maxLines: 1,
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 20,
-                                                  letterSpacing: 0.3),
-                                            
-                                          
-                                       ),
+                                      Row(
+                                      
+                                        children: [
+                                          Expanded(
+                                            flex: 2,
+                                                                                      child: Text(
+                                                    itemdata[index]['foodname'],
+                                                    maxLines: 2,
+                                                    style: TextStyle(
+                                                        fontWeight: FontWeight.w600,
+                                                        fontSize: 20,
+                                                        letterSpacing: 0.3),
+                                                  
+                                                
+                                             ),
+                                          ),
+                                     
+                                         Expanded(child: Text("RM"+itemdata[index]['price'].toString(),style: TextStyle(fontSize:17),))
+                                        ],
+                                      ),
                                        SizedBox(height: 5),
                                         Text(
                                           "From " +
@@ -556,7 +567,7 @@ class _MainPageState extends State<MainPage> {
         });
       } else {
         print('enter got data');
-        print(res);
+        print(res.body);
         setState(() {
           var extractdata = json.decode(res.body);
           itemdata = extractdata["food"];
@@ -672,7 +683,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   _onFoodDetail(itemdata, itemdata2, itemdata3, itemdata4, itemdata5, itemdata6,
-      itemdata7, itemdata8,itemdata9) {
+      itemdata7, itemdata8,itemdata9,itemdata10) {
     Food food = new Food(
         id: itemdata,
         name: itemdata2,
@@ -682,7 +693,8 @@ class _MainPageState extends State<MainPage> {
         available: itemdata6,
         rating: itemdata7,
         regdate: itemdata8,
-        foodimage: itemdata9);
+        foodimage: itemdata9,
+        fowner: itemdata10);
     Navigator.push(
         context,
         MaterialPageRoute(

@@ -16,11 +16,13 @@ import 'package:http/http.dart' as http;
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:async/async.dart';
 import 'dart:convert';
-import 'package:badges/badges.dart';
 import 'tabscreen/trymap.dart';
 import 'tabscreen/provider.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
+import 'dart:io';
+import 'tabscreen/orderdemo.dart';
+
 
 class MainScreen extends StatefulWidget {
   final User user;
@@ -41,8 +43,10 @@ class _MainScreenState extends State<MainScreen> {
   bool _isEmpty = false;
   FirebaseMessaging _fcm = FirebaseMessaging();
   String token1;
+  static bool isNotified=false;
 
   void firebaseListerners() {
+    
     _fcm.getToken().then((token) {
       print('Token is ' + token);
       token1 = token;
@@ -55,7 +59,7 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     firebaseListerners();
-
+    getMessage();
     print('mainscreen;');
     if (widget.user.type == 'Food Buyer' ||
         widget.user.type == 'unregistered') {
@@ -73,7 +77,7 @@ class _MainScreenState extends State<MainScreen> {
     } else {
       tabs = [
         ProviderScreen(user: widget.user),
-        OrderFoodPage(user: widget.user),
+        OrderScreen(user: widget.user),
         ProfileScreen(user: widget.user),
       ];
     }
@@ -90,188 +94,247 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: tabs[currentTabIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: onTapped,
-        iconSize: 30,
-        elevation: 5,
-        currentIndex: currentTabIndex,
-        backgroundColor: Colors.white,
-        selectedItemColor: Colors.blueAccent,
-        unselectedItemColor: Colors.blueGrey,
-        showSelectedLabels: true,
-        showUnselectedLabels: false,
-        type: BottomNavigationBarType.fixed,
-        items: [
-          BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              title: Text(
-                "Home",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              )),
-          /* BottomNavigationBarItem(
-                  icon: Badge(
-                    showBadge: _isEmpty,
-                    badgeContent: Text(count.toString(),
-                        style: TextStyle(color: Colors.white)),
-                    child: Icon(MdiIcons.cart),
-                  ),
-                  title: Text('Cart',style: TextStyle(fontWeight: FontWeight.bold))),*/
-          /*  BottomNavigationBarItem(
-                      icon: new Stack(
-                        children: <Widget>[
-                          new Icon(MdiIcons.cart),
-                          count > 0
-                              ? Visibility(
-                                  visible: _isVisible,
-                                  child: new Positioned(
-                                    right: 0,
-                                    child: Container(
-                                        padding: EdgeInsets.all(1),
-                                        decoration: BoxDecoration(
-                                          color: Colors.redAccent,
-                                          borderRadius: BorderRadius.circular(6),
-                                        ),
-                                        constraints: BoxConstraints(
-                                          minWidth: 13,
-                                          maxHeight: 12,
-                                        ),
-                                        child: new Text(
-                                          "${count}",
-                                          style: TextStyle(
-                                              color: Colors.white, fontSize: 8),
-                                          textAlign: TextAlign.center,
-                                        )),
-                                  ),
-                                )
-                              : Visibility(
-                                  visible: false,
-                                  child: Container(
-                                    child: Text('s'),
-                                  ),
-                                )
-                        ],
-                      ),
-                      title: Text('Cart')),*/
-          BottomNavigationBarItem(
-              icon: _statusType(),
-              title: Text("Delivery",
-                  style: TextStyle(fontWeight: FontWeight.bold))),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle),
-              title: Text("Profile",
-                  style: TextStyle(fontWeight: FontWeight.bold))),
-        ],
-      ),
-    );
-  }
-
-  void _loadCart(int _num) async {
-    _isVisible = false;
-    ProgressDialog pr = new ProgressDialog(context,
-        isDismissible: false, type: ProgressDialogType.Normal);
-    pr.style(message: "Loading Cart");
-    pr.show();
-    String urlLoadCart = server + "/php/load_cart.php";
-    http.post(urlLoadCart, body: {
-      "email": widget.user.email,
-    }).then((res) {
-      print(res.body);
-
-      Future.delayed(Duration(seconds: 2)).then((value) {
-        pr.hide().whenComplete(() {
-          print(pr.isShowing());
-        });
-      });
-      if (res.body == "Cart Empty") {
-        widget.user.quantity = "0";
-
-        return;
-      }
-
-      setState(() async {
-        var extractdata = json.decode(res.body);
-        itemCart = extractdata["cart"];
-
-        for (int i = 0; i < itemCart.length; i++) {
-          _num = int.parse(itemCart[i]['cquantity']) + _num;
+    return WillPopScope(
+      onWillPop: _willPopScope,
+                child: Scaffold(
+              body: tabs[currentTabIndex],
+              bottomNavigationBar: BottomNavigationBar(
+                onTap: onTapped,
+                iconSize: 30,
+                elevation: 5,
+                currentIndex: currentTabIndex,
+                backgroundColor: Colors.white,
+                selectedItemColor: Colors.blueAccent,
+                unselectedItemColor: Colors.blueGrey,
+                showSelectedLabels: true,
+                showUnselectedLabels: false,
+                type: BottomNavigationBarType.fixed,
+                items: [
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.home),
+                      title: Text(
+                        "Home",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      )),
+                  /* BottomNavigationBarItem(
+                          icon: Badge(
+                            showBadge: _isEmpty,
+                            badgeContent: Text(count.toString(),
+                                style: TextStyle(color: Colors.white)),
+                            child: Icon(MdiIcons.cart),
+                          ),
+                          title: Text('Cart',style: TextStyle(fontWeight: FontWeight.bold))),*/
+                  /*  BottomNavigationBarItem(
+                              icon: new Stack(
+                                children: <Widget>[
+                                  new Icon(MdiIcons.cart),
+                                  count > 0
+                                      ? Visibility(
+                                          visible: _isVisible,
+                                          child: new Positioned(
+                                            right: 0,
+                                            child: Container(
+                                                padding: EdgeInsets.all(1),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.redAccent,
+                                                  borderRadius: BorderRadius.circular(6),
+                                                ),
+                                                constraints: BoxConstraints(
+                                                  minWidth: 13,
+                                                  maxHeight: 12,
+                                                ),
+                                                child: new Text(
+                                                  "${count}",
+                                                  style: TextStyle(
+                                                      color: Colors.white, fontSize: 8),
+                                                  textAlign: TextAlign.center,
+                                                )),
+                                          ),
+                                        )
+                                      : Visibility(
+                                          visible: false,
+                                          child: Container(
+                                            child: Text('s'),
+                                          ),
+                                        )
+                                ],
+                              ),
+                              title: Text('Cart')),*/
+                  BottomNavigationBarItem(
+                      icon: _statusType(),
+                      title: Text("Delivery",
+                          style: TextStyle(fontWeight: FontWeight.bold))),
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.account_circle),
+                      title: Text("Profile",
+                          style: TextStyle(fontWeight: FontWeight.bold))),
+                ],
+              ),
+            ),
+          );
         }
-        if (_num > 0) {
-          _isEmpty = true;
-        }
-        print('helo' + _num.toString());
-        count = _num;
-        //_amountPayable = _totalPrice + double.parse(_deliveryCharge);
-
-        Future.delayed(Duration(seconds: 1)).then((value) {
-          pr.hide().whenComplete(() {
-            print(pr.isShowing());
+      
+        void _loadCart(int _num) async {
+          _isVisible = false;
+          ProgressDialog pr = new ProgressDialog(context,
+              isDismissible: false, type: ProgressDialogType.Normal);
+          pr.style(message: "Loading Cart");
+          pr.show();
+          String urlLoadCart = server + "/php/load_cart.php";
+          http.post(urlLoadCart, body: {
+            "email": widget.user.email,
+          }).then((res) {
+            print(res.body);
+      
+            Future.delayed(Duration(seconds: 2)).then((value) {
+              pr.hide().whenComplete(() {
+                print(pr.isShowing());
+              });
+            });
+            if (res.body == "Cart Empty") {
+              widget.user.quantity = "0";
+      
+              return;
+            }
+      
+            setState(() async {
+              var extractdata = json.decode(res.body);
+              itemCart = extractdata["cart"];
+      
+              for (int i = 0; i < itemCart.length; i++) {
+                _num = int.parse(itemCart[i]['cquantity']) + _num;
+              }
+              if (_num > 0) {
+                _isEmpty = true;
+              }
+              print('helo' + _num.toString());
+              count = _num;
+              //_amountPayable = _totalPrice + double.parse(_deliveryCharge);
+      
+              Future.delayed(Duration(seconds: 1)).then((value) {
+                pr.hide().whenComplete(() {
+                  print(pr.isShowing());
+                });
+              });
+            });
+          }).catchError((err) {
+            print(err);
+            Future.delayed(Duration(seconds: 1)).then((value) {
+              pr.hide().whenComplete(() {
+                print(pr.isShowing());
+              });
+            });
           });
-        });
-      });
-    }).catchError((err) {
-      print(err);
-      Future.delayed(Duration(seconds: 1)).then((value) {
-        pr.hide().whenComplete(() {
-          print(pr.isShowing());
-        });
-      });
-    });
-    Future.delayed(Duration(seconds: 1)).then((value) {
-      pr.hide().whenComplete(() {
-        print(pr.isShowing());
-      });
-    });
-  }
-
-  Widget _statusType() {
-    if (widget.user.type == 'Food Buyer') {
-      return Icon(Icons.directions_walk);
-    } else if (widget.user.type == "Transporter") {
-      return Icon(Icons.motorcycle);
-    } else {
-      return Icon(Icons.notification_important);
-    }
-  }
-
-  void _loadPref() async {
-    int _hold = 0;
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    _hold = (prefs.getInt("cquantity"));
-    setState(() {
-      if (_hold > 0) {
-        _isEmpty = true;
-        count = _hold;
-        return;
-      }
-    });
-  }
-
-  Future init() async {
-    this._loadPref();
-  }
-
-  void _loadUser() {
-    print('enter user inform :' + token1);
-
-    if (widget.user.token == null || widget.user.token == '') {
-      widget.user.token = token1;
-
-      http.post(server + "/php/add_token.php", body: {
-        'email': widget.user.email,
-        'token': token1,
-      }).then((res) {
-        if (res.body == 'success') {
-          print('success added token');
-        } else {
-          print('failed add token');
+          Future.delayed(Duration(seconds: 1)).then((value) {
+            pr.hide().whenComplete(() {
+              print(pr.isShowing());
+            });
+          });
         }
-      }).catchError((err) {
-        print(err);
-      });
-    } else {
-      print('got token');
-    }
+      
+        Widget _statusType() {
+          if (widget.user.type == 'Food Buyer') {
+            return Icon(Icons.directions_walk);
+          } else if (widget.user.type == "Transporter") {
+            return Icon(Icons.motorcycle);
+          } else {
+            return Icon(Icons.notification_important);
+          }
+        }
+      
+        void _loadPref() async {
+          int _hold = 0;
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          _hold = (prefs.getInt("cquantity"));
+          setState(() {
+            if (_hold > 0) {
+              _isEmpty = true;
+              count = _hold;
+              return;
+            }
+          });
+        }
+      
+        Future init() async {
+          this._loadPref();
+        }
+      
+        void _loadUser() {
+          print('enter user inform :' + token1);
+      
+          if (widget.user.token == null || widget.user.token == '' || widget.user.token!=token1) {
+            widget.user.token = token1;
+      
+            http.post(server + "/php/add_token.php", body: {
+              'email': widget.user.email,
+              'token': token1,
+            }).then((res) {
+              if (res.body == 'success') {
+                print('success added token');
+              } else {
+                print('failed add token');
+              }
+            }).catchError((err) {
+              print(err);
+            });
+          } else {
+            print('got token');
+          }
+        }
+      
+         void getMessage() {
+           print('send msg');
+          if (Platform.isIOS) {
+            _fcm.requestNotificationPermissions(IosNotificationSettings());
+          }
+          _fcm.configure(onMessage: (Map<String, dynamic> message) async {
+        
+            print('onMessage: $message');
+           
+            showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                      content: ListTile(
+                        title: Text(message['notification']['title']),
+                        subtitle: Text(message['notification']['body']),
+                      ),
+                      actions: <Widget>[
+                        FlatButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: Text('Ok'))
+                      ],
+                    ));
+                  
+          }, onLaunch: (Map<String, dynamic> message) async {
+            print('onMessage: $message');
+          }, onResume: (Map<String, dynamic> message) async {
+            print('onMessage: $message');
+            
+          });
+        }
+      
+        Future<bool> _willPopScope() {
+          return showDialog(context: context,builder:(context)=>new AlertDialog(
+            title: Align(alignment:Alignment.center,child: Text('Exit Deliver2U')),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(20.0)),
+            ),
+            actions: [
+              MaterialButton(
+                 child: Text('Exit'),
+                onPressed: (){
+                SystemChannels.platform.invokeMethod ('SystemNavigator.pop');
+              }
+             
+              ),
+              MaterialButton(
+                 child: Text('No'),
+                onPressed: (){
+                Navigator.of(context).pop(false);
+              }
+             
+              )
+            ],
+          ))??false;
   }
 }

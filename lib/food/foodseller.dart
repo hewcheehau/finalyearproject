@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:fypv1/main.dart';
+import 'package:fypv1/tabscreen/provider.dart';
 import 'package:fypv1/user.dart';
 import 'package:fypv1/food.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:http/http.dart' as http;
+import 'package:progress_dialog/progress_dialog.dart';
 
 class FoodSellDetail extends StatefulWidget {
   final User user;
@@ -29,7 +33,6 @@ class _FoodSellDetailState extends State<FoodSellDetail> {
   TextEditingController fprice = new TextEditingController();
   TextEditingController fquantity = new TextEditingController();
 
-
   @override
   void initState() {
     super.initState();
@@ -55,8 +58,12 @@ class _FoodSellDetailState extends State<FoodSellDetail> {
         backgroundColor: Colors.white,
         actions: <Widget>[
           IconButton(
-            tooltip: 'Delete this product forever',
-            icon: Icon(Icons.delete_outline,color: Colors.red,), onPressed: (){})
+              tooltip: 'Delete this product forever',
+              icon: Icon(
+                Icons.delete_outline,
+                color: Colors.red,
+              ),
+              onPressed: _onDeleteProduct)
         ],
       ),
       body: Center(
@@ -260,7 +267,7 @@ class _FoodSellDetailState extends State<FoodSellDetail> {
                             ]),
                           ],
                         ),
-                        SizedBox(height:5)
+                        SizedBox(height: 5)
                       ],
                     ),
                   ),
@@ -288,5 +295,75 @@ class _FoodSellDetailState extends State<FoodSellDetail> {
         ),
       ),
     );
+  }
+
+  void _onDeleteProduct() async {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20.0))),
+              title: new Text('Delete this product?'),
+              content: Text(
+                  'Do you want to delete this item from your product list?'),
+              actions: [
+                MaterialButton(
+                    child: Text('Yes'),
+                    onPressed: () {
+                      Navigator.of(context).pop(false);
+                      ProgressDialog pr =
+                          new ProgressDialog(context, isDismissible: true);
+                      pr.style(message: 'Deleting...');
+                      pr.show();
+                      http.post(server + "/php/delete_product.php", body: {
+                        "email": widget.user.email,
+                        "foodid": widget.food.id
+                      }).then((res) {
+                        print(res.body);
+
+                        if (res.body == "success") {
+                          Future.delayed(Duration(seconds: 2)).then((value) {
+                            pr.hide().whenComplete(() {
+                              print(pr.isShowing());
+                            });
+                          });
+                          setState(() {
+                            _showSuccessInfo();
+                          });
+                        } else {}
+                      }).catchError((err) {
+                        print(err);
+                      });
+                    }),
+                MaterialButton(
+                    child: Text('No'),
+                    onPressed: () => {Navigator.of(context).pop(false)})
+              ],
+            ));
+  }
+
+  void _showSuccessInfo() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Delete successfully'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Ok', textAlign: TextAlign.center),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => MainScreen(
+                                user: widget.user,
+                              )),
+                      (route) => false);
+                },
+              )
+            ],
+          );
+        });
   }
 }

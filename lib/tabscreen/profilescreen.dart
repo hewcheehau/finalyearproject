@@ -813,16 +813,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
     showDialog(
         context: context,
         builder: (BuildContext context) => SimpleDialog(
-              title: Row(
-                children: <Widget>[
-                   Text('Select Account Type'),
-                   Icon(Icons.swap_horiz)
+              title: Column(
+                children: [
+                  Row(
+                    children: <Widget>[
+                       Text('Select Account Type'),
+                       Icon(Icons.swap_horiz)
+                    ],
+                  ),
+                  SizedBox(height:5),
+                  Text("Current :"+widget.user.type,style: TextStyle(fontSize:17,color:Colors.grey),)
                 ],
               ),
+              
               backgroundColor: Colors.grey[30],
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10)),
               children: <Widget>[
+                
                 Visibility(
                   visible: _isFoodBuyer,
                   child: SimpleDialogOption(

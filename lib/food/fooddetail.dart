@@ -81,7 +81,6 @@ class _FoodDetailState extends State<FoodDetail> {
                               gradient: LinearGradient(
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter,
-                                  
                                   colors: [
                                 const Color(0xCC000000),
                                 const Color(0x00000000),
@@ -285,7 +284,7 @@ class _FoodDetailState extends State<FoodDetail> {
                                       Container(
                                           alignment: Alignment.topLeft,
                                           child: Text(
-                                              'Include: 1x' + widget.food.name,
+                                              'Include: 1 x ' + widget.food.name,
                                               style: TextStyle(
                                                   color: Colors.grey))),
                                       SizedBox(height: 10),
@@ -430,6 +429,26 @@ class _FoodDetailState extends State<FoodDetail> {
     if (widget.user.email == "unregister@hewdeliver.com" ||
         widget.user.name == 'unregistered') {
       Toast.show("Please Register/Login.", context,
+          duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+      return;
+    }
+    if (widget.user.email == widget.food.fowner) {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) => AlertDialog(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                  
+                title: Text('Fail to add.'),
+                actions: [
+                  Center(
+                    child: MaterialButton(
+                        child: Text('OK'),
+                        onPressed: () => {Navigator.of(context).pop()}),
+                  )
+                ],
+              ));
+      Toast.show("This food is provided by this account.", context,
           duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       return;
     }

@@ -333,6 +333,7 @@ class _NewFoodState extends State<NewFood> {
     CircularProgressIndicator(
       valueColor: AlwaysStoppedAnimation<Color>(Colors.blueAccent),
     );
+    if(fname.text!=null && faddress.text!=null && fquantity.text!=null && fprice.text!=null){
     String base64Image = base64Encode(_image.readAsBytesSync());
     http.post(server + "/php/add_food.php", body: {
       "encoded_string": base64Image,
@@ -360,6 +361,10 @@ class _NewFoodState extends State<NewFood> {
     }).catchError((err) {
       print(err);
     });
+    }else{
+      Toast.show('Please complete the form', context,duration: Toast.LENGTH_LONG,gravity: Toast.BOTTOM);
+      return;
+    }
   }
 
   void _showSuccess() {

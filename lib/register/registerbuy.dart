@@ -99,6 +99,11 @@ class _RegisterWidgetState extends State<RegisterWidget> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _autoValidate = false;
   String server = "http://lawlietaini.com/hewdeliver";
+  FocusNode _node0 = new FocusNode();
+  FocusNode _node1 = new FocusNode();
+  FocusNode _node2 = new FocusNode();
+  FocusNode _node3 = new FocusNode();
+  FocusNode _node4 = new FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -119,7 +124,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                         image: _image == null
                             ? AssetImage(pathAsset)
                             : FileImage(_image),
-                        fit: BoxFit.fill)),
+                        fit: BoxFit.cover)),
               ),
             ),
             Positioned(
@@ -138,7 +143,12 @@ class _RegisterWidgetState extends State<RegisterWidget> {
         TextFormField(
           controller: _namecontroller,
           keyboardType: TextInputType.text,
+          focusNode: _node0,
+          onFieldSubmitted: (value){
+            FocusScope.of(context).requestFocus(_node1);
+          },
           decoration: InputDecoration(
+              
               labelText: 'Username',
               border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20),
@@ -149,6 +159,10 @@ class _RegisterWidgetState extends State<RegisterWidget> {
         TextFormField(
           controller: _emcontroller,
           keyboardType: TextInputType.emailAddress,
+          focusNode: _node1,
+          onFieldSubmitted: (value){
+            FocusScope.of(context).requestFocus(_node2);
+          },
           validator: (value) {
             if (!_isEmailValid(value)) {
               return "Email format is invalid";
@@ -169,6 +183,10 @@ class _RegisterWidgetState extends State<RegisterWidget> {
           obscureText: true,
           controller: _pwcontroller,
           keyboardType: TextInputType.numberWithOptions(),
+          focusNode: _node2,
+          onFieldSubmitted: (value){
+            FocusScope.of(context).requestFocus(_node3);
+          },
           validator: (value) {
             if (value.isEmpty) {
               return "Password cannot be empty.";
@@ -187,6 +205,10 @@ class _RegisterWidgetState extends State<RegisterWidget> {
         TextFormField(
           controller: _phcontroller,
           keyboardType: TextInputType.phone,
+          focusNode: _node3,
+          onFieldSubmitted: (value){
+            FocusScope.of(context).requestFocus(_node4);
+          },
           validator: (value) {
             if (value.isEmpty) {
               return "Phone cannot be  empty.";
@@ -215,6 +237,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
             elevation: 0,
             textColor: Colors.white,
             onPressed: _uploadData,
+            focusNode: _node4,
             color: Colors.transparent,
             child: Container(
               padding: EdgeInsets.fromLTRB(110, 18, 110, 18),
@@ -261,11 +284,13 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                         source: ImageSource.camera,
                         maxHeight: 400,
                         maxWidth: 300,
-                        imageQuality: 70);
+                        imageQuality: 80);
 
                     setState(() {
+                      if(image!=null){
                        _image = File(image.path);
                         Navigator.of(context).pop(false);
+                      }
                     });
                   },
                 ),
@@ -273,14 +298,16 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                   leading: Icon(Icons.photo_album),
                   title: Text('Gallery'),
                   onTap: () async {
-                    /*  _image = await ImagePicker.pickImage(
-                            source: ImageSource.gallery,
-                            imageQuality: 80,
-                            maxHeight: 450,
-                            maxWidth: double.infinity);*/
+                    PickedFile image = await _picker.getImage(source: ImageSource.gallery,
+                    maxHeight:400, maxWidth:300, imageQuality:80);
                     setState(() {
-                      Navigator.pop(context);
+                      if(image!=null){
+                        _image = File(image.path);
+                        Navigator.of(context).pop(false);
+                      }
                     });
+
+                    
                   },
                 )
               ],
@@ -294,6 +321,12 @@ class _RegisterWidgetState extends State<RegisterWidget> {
             r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
         .hasMatch(email);
   }
+  bool _isPhoneValid(String phone){
+
+    return RegExp(
+        r"^0\d{10}"
+    ).hasMatch(phone);
+  }
 
   void _uploadData() {
     // _validateInput();
@@ -304,7 +337,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
 
     if ((_isEmailValid(_email)) &&
         (_password.length > 5) &&
-        (_phone.length > 5) &&
+        (_phone.length > 5) && (_phone.length <= 11) && (_isPhoneValid(_phone))&&
         (_image != null)) {
       ProgressDialog pr = new ProgressDialog(context,
           type: ProgressDialogType.Normal, isDismissible: false);
