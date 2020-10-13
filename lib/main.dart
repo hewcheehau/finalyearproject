@@ -22,7 +22,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
 import 'dart:io';
 import 'tabscreen/orderdemo.dart';
-
+import 'package:fypv1/tabscreen/buyerorder.dart';
 
 class MainScreen extends StatefulWidget {
   final User user;
@@ -44,6 +44,7 @@ class _MainScreenState extends State<MainScreen> {
   FirebaseMessaging _fcm = FirebaseMessaging();
   String token1;
   static bool isNotified=false;
+  bool _orderbadge = false;
 
   void firebaseListerners() {
     
@@ -65,7 +66,7 @@ class _MainScreenState extends State<MainScreen> {
         widget.user.type == 'unregistered') {
       tabs = [
         MainPage(user: widget.user),
-        OrderFoodPage(user: widget.user),
+        BuyerOrderScreen(user: widget.user),
         ProfileScreen(user: widget.user),
       ];
     } else if (widget.user.type == 'Transporter') {
@@ -161,7 +162,19 @@ class _MainScreenState extends State<MainScreen> {
                               ),
                               title: Text('Cart')),*/
                   BottomNavigationBarItem(
-                      icon: _statusType(),
+                      icon: new Stack(children: [
+                        _statusType(),
+                        Visibility(
+                          visible: _orderbadge,
+                                                  child: Positioned(right:0,
+                          
+                          top: 0.0,
+                          child: new Icon(Icons.brightness_1,size:11.0,color: Colors.redAccent)
+                          ),
+                        )
+
+                      ],),
+                      
                       title: Text("Delivery",
                           style: TextStyle(fontWeight: FontWeight.bold))),
                   BottomNavigationBarItem(

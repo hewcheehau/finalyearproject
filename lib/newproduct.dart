@@ -202,7 +202,7 @@ class _NewFoodState extends State<NewFood> {
                                   child: TextFormField(
                                     controller: fquantity,
                                     focusNode: _focus2,
-                                    keyboardType: TextInputType.number,
+                                    keyboardType: TextInputType.numberWithOptions(),
                                     textInputAction: TextInputAction.next,
                                     onFieldSubmitted: (value) {
                                       FocusScope.of(context)

@@ -45,6 +45,7 @@ dependencies:
   flutter_webview_plugin: ^0.3.11
   
   
+  
  
 
 
@@ -80,6 +81,7 @@ flutter:
     - asset/images/cover1.png
     - asset/images/profile.jpg
     - asset/images/nofood.png
+    - asset/images/order.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

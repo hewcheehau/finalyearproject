@@ -20,7 +20,6 @@ import 'package:fypv1/payment.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:fypv1/provider.dart';
 
-
 class CartPage extends StatefulWidget {
   final User user;
   final Provider prd;
@@ -56,6 +55,8 @@ class _CartPageState extends State<CartPage> {
   String token1;
   String _tokenOwner;
   String _methodpay = "";
+  int _value = 1;
+  TextEditingController _address = new TextEditingController();
 
   void firebaseListerners() {
     if (_tokenOwner == null || _tokenOwner == '') {
@@ -90,6 +91,8 @@ class _CartPageState extends State<CartPage> {
 
   @override
   Widget build(BuildContext context) {
+    TextEditingController _setAddress = new TextEditingController();
+
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
@@ -181,82 +184,149 @@ class _CartPageState extends State<CartPage> {
                                         SizedBox(
                                           height: 10,
                                         ),
-                                        /* Container(
-                                            padding: EdgeInsets.only(left: 10),
-                                            alignment: Alignment.topLeft,
-                                            child: Column(
-                                              children: <Widget>[
-                                                Row(
-                                                  children: <Widget>[
-                                                    Text("Delivery address"),
-                                                    FlatButton(
-                                                        onPressed: () =>
-                                                            {_loadMapDialog()},
-                                                        child: Icon(
-                                                          Icons.location_on,
-                                                          color:
-                                                              Colors.lightBlue,
-                                                        ))
-                                                  ],
-                                                ),
-                                              ],
-                                            )),*/
-                                        SizedBox(
-                                          height: 10,
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 25, right: 25),
+                                          child: Row(
+                                            children: [
+                                              Text(
+                                                '*Select Delivery Address*',
+                                                style: TextStyle(
+                                                    color: Colors.red),
+                                              ),
+                                              SizedBox(width: 5),
+                                            ],
+                                          ),
                                         ),
                                         Container(
                                           padding:
-                                              EdgeInsets.fromLTRB(35, 0, 35, 0),
+                                              EdgeInsets.fromLTRB(25, 8, 25, 0),
                                           child: Table(
                                             defaultColumnWidth:
                                                 FlexColumnWidth(1.0),
                                             columnWidths: {
-                                              0: FlexColumnWidth(7),
-                                              1: FlexColumnWidth(6),
+                                              0: FlexColumnWidth(5),
+                                              1: FlexColumnWidth(5),
                                             },
                                             children: [
                                               TableRow(children: [
                                                 TableCell(
-                                                  child: Container(
-                                                    height: 60,
-                                                    child: Text(
-                                                      'Current address',
-                                                      style: TextStyle(
-                                                          color: Colors.black87,
-                                                          fontSize: 15,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                  ),
+                                                  child:
+                                                      /*Container(
+                                                          height: 60,
+                                                          child: Text(
+                                                            'Current address',
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .clip,
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .black87,
+                                                                fontSize: 15,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          ),
+                                                        ),*/
+                                                      DropdownButton(
+                                                          icon: Icon(
+                                                              Icons
+                                                                  .arrow_drop_down,
+                                                              color:
+                                                                  Colors.black,
+                                                              size: 25),
+
+                                                          //    hint: Text('Please select address option',style: TextStyle(color:Colors.black87),),
+                                                          value: _value,
+                                                          items: [
+                                                            DropdownMenuItem(
+                                                                value: 1,
+                                                                child: Text(
+                                                                    'Current address')),
+                                                            DropdownMenuItem(
+                                                                value: 2,
+                                                                child: Text(
+                                                                    'Enter address')),
+                                                          ],
+                                                          onChanged: (value) {
+                                                            setState(() {
+                                                              _value = value;
+                                                            });
+                                                          }),
                                                 ),
                                                 TableCell(
                                                   child: Container(
-                                                    height: 60,
-                                                    child: InkWell(
-                                                      onTap: () {
-                                                        _loadMapDialog();
-                                                      },
-                                                      child: Text(
-                                                        curaddress ??
-                                                            "Address not set.",
-                                                        maxLines: 5,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                    ),
+                                                    height: 45,
+                                                    child: _value == 1
+                                                        ? InkWell(
+                                                            onTap: () {
+                                                              _loadMapDialog();
+                                                            },
+                                                            child: Text(
+                                                              curaddress ??
+                                                                  "Address not set.",
+                                                              maxLines: 5,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                            ),
+                                                          )
+                                                        : Container(
+                                                            height: 45,
+                                                            child:
+                                                                TextFormField(
+                                                              controller:
+                                                                  _address,
+                                                              decoration: InputDecoration(
+                                                                  labelText:
+                                                                      'Enter address',
+                                                                  border:
+                                                                      OutlineInputBorder()),
+                                                            ),
+                                                          ),
                                                   ),
                                                 )
                                               ]),
+                                              /*     : TableRow(children: [
+                                                      TableCell(
+                                                        child: Container(
+                                                          height: 60,
+                                                          child: Text(
+                                                            'Enter address',
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .black87,
+                                                                fontSize: 15,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      TableCell(
+                                                        child: Container(
+                                                          height: 60,
+                                                          child: TextField(
+                                                            controller:
+                                                                _setAddress,
+                                                            decoration:
+                                                                InputDecoration(
+                                                                    border:
+                                                                        OutlineInputBorder()),
+                                                          ),
+                                                        ),
+                                                      )
+                                                    ]),*/
                                               TableRow(children: [
                                                 TableCell(
                                                   child: Container(
                                                     alignment:
                                                         Alignment.centerLeft,
-                                                    height: 30,
+                                                    height: 35,
                                                     child: Text(
                                                       "Order Quantity",
                                                       style: TextStyle(
-                                                          fontSize: 20,
+                                                          fontSize: 15,
                                                           fontWeight:
                                                               FontWeight.bold),
                                                     ),
@@ -266,7 +336,7 @@ class _CartPageState extends State<CartPage> {
                                                   child: Container(
                                                       alignment:
                                                           Alignment.centerLeft,
-                                                      height: 30,
+                                                      height: 35,
                                                       child: Column(
                                                         children: <Widget>[
                                                           Expanded(
@@ -385,7 +455,7 @@ class _CartPageState extends State<CartPage> {
                                                         itemCart[index - 1]
                                                             ['name'],
                                                         style: TextStyle(
-                                                            fontSize: 20,
+                                                            fontSize: 15,
                                                             fontWeight:
                                                                 FontWeight
                                                                     .bold),
@@ -403,7 +473,7 @@ class _CartPageState extends State<CartPage> {
                                                                       2) ??
                                                           0.0,
                                                       style: TextStyle(
-                                                          fontSize: 20,
+                                                          fontSize: 18,
                                                           fontWeight:
                                                               FontWeight.bold),
                                                     ),
@@ -419,7 +489,7 @@ class _CartPageState extends State<CartPage> {
                                                     child: Text(
                                                       "Delivery fees",
                                                       style: TextStyle(
-                                                          fontSize: 20,
+                                                          fontSize: 15,
                                                           fontWeight:
                                                               FontWeight.bold),
                                                     ),
@@ -435,7 +505,7 @@ class _CartPageState extends State<CartPage> {
                                                         style: TextStyle(
                                                             fontWeight:
                                                                 FontWeight.bold,
-                                                            fontSize: 20),
+                                                            fontSize: 18),
                                                       )),
                                                 ),
                                               ]),
@@ -494,9 +564,6 @@ class _CartPageState extends State<CartPage> {
                                             )
                                           ],
                                         ),
-                                        FlatButton(
-                                           // onPressed: () => {_getQue()},
-                                            child: Text('send'))
                                       ],
                                     )
                                   ],
@@ -937,6 +1004,14 @@ class _CartPageState extends State<CartPage> {
   Future<void> _payusingCredit(double newamount) async {}
 
   Future<void> makePayment() async {
+    String _curaddress;
+
+    if (_value == 1) {
+      _curaddress = curaddress;
+    } else {
+      _curaddress = _address.text;
+    }
+
     if (_amountPayable < 0) {
       double newamount = _amountPayable * -1;
       await _payusingCredit(newamount);
@@ -968,13 +1043,36 @@ class _CartPageState extends State<CartPage> {
                   orderid: orderId,
                   methodpay: _methodpay,
                   tokenowner: _tokenOwner,
+                  address: _curaddress,
                 )));
 
     _loadCart();
   }
 
-
+  void _enterAddress() {
+    TextEditingController _address =
+        new TextEditingController(text: widget.user.address);
+    showDialog(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+              title: Row(
+                children: [
+                  Icon(Icons.local_attraction_outlined),
+                  Text('Enter Address'),
+                ],
+              ),
+              content: TextField(
+                controller: _address,
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10))),
+              ),
+              actions: [
+                new FlatButton(onPressed: () {}, child: Text('Submit')),
+                new FlatButton(
+                    onPressed: () => {Navigator.of(context).pop()},
+                    child: Text('Back'))
+              ],
+            ));
   }
-
- 
-
+}

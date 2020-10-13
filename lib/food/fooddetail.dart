@@ -11,6 +11,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fypv1/tabscreen/cartpage.dart';
 import 'package:fypv1/main.dart';
 import 'dart:async';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+
 
 class FoodDetail extends StatefulWidget {
   final User user;
@@ -163,7 +165,9 @@ class _FoodDetailState extends State<FoodDetail> {
                                       Divider(),
                                       Column(
                                         children: [
-                                          if (widget.food.rating == '1') ...[
+                                          
+                                          
+                                         if (widget.food.rating.toString() == '1') ...[
                                             Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment.start,
@@ -185,7 +189,7 @@ class _FoodDetailState extends State<FoodDetail> {
                                                     color: Colors.amber),
                                               ],
                                             ),
-                                          ] else if (widget.food.rating ==
+                                          ] else if (widget.food.rating.toString() ==
                                               '2') ...[
                                             Row(
                                               mainAxisAlignment:
@@ -206,7 +210,7 @@ class _FoodDetailState extends State<FoodDetail> {
                                                     color: Colors.amber),
                                               ],
                                             ),
-                                          ] else if (widget.food.rating ==
+                                          ] else if (widget.food.rating.toString() ==
                                               '3') ...[
                                             Row(
                                               mainAxisAlignment:
@@ -227,7 +231,7 @@ class _FoodDetailState extends State<FoodDetail> {
                                                     color: Colors.amber),
                                               ],
                                             ),
-                                          ] else if (widget.food.rating ==
+                                          ] else if (widget.food.rating.toString() ==
                                               '4') ...[
                                             Row(
                                               mainAxisAlignment:
@@ -247,6 +251,40 @@ class _FoodDetailState extends State<FoodDetail> {
                                                     color: Colors.amber),
                                                 Icon(Icons.star,
                                                     color: Colors.amber),
+                                                Icon(
+                                                  Icons.star_border,
+                                                  color: Colors.amber,
+                                                )
+                                              ],
+                                            ),
+                                          ] else if (widget.food.rating.toString() ==
+                                              '0') ...[
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: <Widget>[
+                                                Text(
+                                                  'Review: ',
+                                                  style: TextStyle(
+                                                      color: Colors.black87,
+                                                      fontSize: 20),
+                                                ),
+                                                 Icon(
+                                                  Icons.star_border,
+                                                  color: Colors.amber,
+                                                ),
+                                                 Icon(
+                                                  Icons.star_border,
+                                                  color: Colors.amber,
+                                                ),
+                                                 Icon(
+                                                  Icons.star_border,
+                                                  color: Colors.amber,
+                                                ),
+                                                 Icon(
+                                                  Icons.star_border,
+                                                  color: Colors.amber,
+                                                ),
                                                 Icon(
                                                   Icons.star_border,
                                                   color: Colors.amber,
@@ -291,7 +329,7 @@ class _FoodDetailState extends State<FoodDetail> {
                                       Container(
                                           alignment: Alignment.topLeft,
                                           child: Text(
-                                              'Location: ' + widget.food.name,
+                                              'Location: ' + widget.food.shopname,
                                               style: TextStyle(
                                                   color: Colors.grey))),
                                       SizedBox(height: 10),
@@ -439,7 +477,8 @@ class _FoodDetailState extends State<FoodDetail> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)),
                   
-                title: Text('Fail to add.'),
+                title: Text('Unable to add.'),
+                content: Text('This food is provided by this account.'),
                 actions: [
                   Center(
                     child: MaterialButton(

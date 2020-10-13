@@ -276,21 +276,7 @@ class _MainPageState extends State<MainPage> {
                               ],
                             ),
                             SizedBox(width: 3),
-                            Column(
-                              children: <Widget>[
-                                FlatButton(
-                                    onPressed: () => _sortFood("Popular"),
-                                    
-                                    child: Column(
-                                      children: <Widget>[
-                                        Icon(MdiIcons.food),
-                                        Text('Popular')
-                                      ],
-                                    )),
-                                    
-
-                              ],
-                            ),
+                   
                             
                           ],
                         ),
@@ -436,10 +422,10 @@ class _MainPageState extends State<MainPage> {
                                           ),
                                         ),
                                       Row(
-                                      
+                                       
                                         children: [
                                           Expanded(
-                                            flex: 2,
+                                            flex: 3,
                                                                                       child: Text(
                                                     itemdata[index]['foodname'],
                                                     maxLines: 2,
@@ -452,7 +438,17 @@ class _MainPageState extends State<MainPage> {
                                              ),
                                           ),
                                      
-                                         Expanded(child: Text("RM"+itemdata[index]['price'].toString(),style: TextStyle(fontSize:17),))
+                                         Expanded(
+                                           flex: 1,
+                                           child: Padding(
+                                             padding: const EdgeInsets.all(5.0),
+                                             child: Row(
+                                             children: [
+                                               Text('RM ',style: TextStyle(fontSize:18),),
+                                               Text(itemdata[index]['price'].toString(),style: TextStyle(fontSize:20,fontWeight: FontWeight.bold),),
+                                             ],
+                                         ),
+                                           ))
                                         ],
                                       ),
                                        SizedBox(height: 5),
