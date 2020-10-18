@@ -515,7 +515,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) =>
-                                          ProfileDetail(user: widget.user)));
+                                          ProfileDetail(user: widget.user))).then((value) => setState((){}));
                             },
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,

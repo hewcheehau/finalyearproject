@@ -10,6 +10,7 @@ import 'dart:convert';
 import 'package:uuid/uuid.dart';
 import 'package:toast/toast.dart';
 import 'package:fypv1/main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 var uuid = Uuid();
 var dateformat = new DateFormat('yyyy-MM-dd');
@@ -351,6 +352,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           }
         
           void _updatepayment() async {
+
             http.post(server + "/php/payment_cod.php", body: {
               'email': widget.user.email,
               'amount': widget.val,
@@ -372,6 +374,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
           }
         
           Future<void> _showResult() async{
+            SharedPreferences pref = await SharedPreferences.getInstance();
+            pref.setInt('payfood', 1);
            await showDialog(context: context,builder:(context)=>AlertDialog(
               title: Text('Ordered successful.'),
               shape: RoundedRectangleBorder(

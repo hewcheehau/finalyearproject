@@ -212,10 +212,7 @@ class _MainPageState extends State<MainPage> {
                                           color: Colors.blue[300],
                                           size: 35,
                                         ),
-                                      /*  Text(
-                                          'Recent',
-                                          style: TextStyle(color: Colors.black),
-                                        )*/
+                                     
                                       ],
                                     )),
                               ],
@@ -362,8 +359,11 @@ class _MainPageState extends State<MainPage> {
                           childAspectRatio: (screenWidth / screenHeight) / 0.37,
                           children: List.generate(itemdata.length, (index) {
                             return Container(
+                              
                               decoration:
-                                  BoxDecoration(shape: BoxShape.rectangle),
+                                  BoxDecoration(shape: BoxShape.rectangle
+                                  
+                                  ),
                               child: Card(
                                 elevation: 5,
                                 shape: RoundedRectangleBorder(

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fypv1/newfood.dart';
-import 'package:fypv1/tabscreen/orderfood.dart';
 import 'package:fypv1/tabscreen/tabscreen.dart';
 import 'package:fypv1/tabscreen/transporter.dart';
 import 'package:fypv1/user.dart';
@@ -23,6 +22,7 @@ import 'package:flutter/services.dart';
 import 'dart:io';
 import 'tabscreen/orderdemo.dart';
 import 'package:fypv1/tabscreen/buyerorder.dart';
+import 'package:fypv1/tabscreen/deliverfood.dart';
 
 class MainScreen extends StatefulWidget {
   final User user;
@@ -72,7 +72,7 @@ class _MainScreenState extends State<MainScreen> {
     } else if (widget.user.type == 'Transporter') {
       tabs = [
         TransporterScreen(user: widget.user),
-        MapSample(),
+        DeliverFood(user:widget.user),
         ProfileScreen(user: widget.user),
       ];
     } else {

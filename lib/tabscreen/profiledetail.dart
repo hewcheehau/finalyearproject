@@ -442,6 +442,8 @@ class _ProfileDetailState extends State<ProfileDetail> {
   }
 
   bool isValidPhone(String phone) {
-    return RegExp(r"^0\d{9,10}").hasMatch(phone);
+    bool _test = RegExp(r"^0\d{9,10}$").hasMatch(phone);
+    print(_test);
+    return RegExp(r"^0\d{9,10}$").hasMatch(phone);
   }
 }

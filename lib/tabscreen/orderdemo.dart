@@ -291,6 +291,12 @@ class _OrderScreenState extends State<OrderScreen> {
           method: itemOrder7,
           orderid: itemOrder8
         );
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>OrderDetail(order:order,user:widget.user)));
+       
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>OrderDetail(order:order,user:widget.user))).then((value) => onGoBack(value));
       }
+
+       FutureOr onGoBack(dynamic value) {
+    _loadRespond();
+    setState(() {});
+  }
 }
