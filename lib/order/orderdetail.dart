@@ -7,6 +7,8 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:fypv1/main.dart';
 
+final double delivercharge = 1.5;
+
 class OrderDetail extends StatefulWidget {
   final Order order;
   final User user;
@@ -37,7 +39,8 @@ class _OrderDetailState extends State<OrderDetail> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Order detail'),
+        title: Text('Order Detail'),
+        centerTitle: true,
         backgroundColor: Colors.blueAccent,
       ),
       body: Container(
@@ -51,15 +54,15 @@ class _OrderDetailState extends State<OrderDetail> {
                 height: screenHeight / 2,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                    color: Colors.blueGrey[50],
+                    color: Colors.white,
                     border: Border.all(),
                     borderRadius: BorderRadius.circular(20)),
                 child: Column(
                   children: [
                     SizedBox(height: 5),
                     Icon(
-                      Icons.alarm_add_outlined,
-                      color: Colors.blueGrey,
+                      Icons.notifications_on_outlined,
+                      color: Colors.blueAccent,
                       size: 30,
                     ),
                     Padding(
@@ -105,7 +108,7 @@ class _OrderDetailState extends State<OrderDetail> {
                             )),
                             TableCell(
                                 child: Text(
-                              "RM ${widget.order.price}",
+                              "RM ${widget.order.total}",
                               style: TextStyle(
                                   fontSize: 18.0, fontWeight: FontWeight.bold),
                             ))
@@ -133,21 +136,62 @@ class _OrderDetailState extends State<OrderDetail> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        MaterialButton(
-                            shape: Border.all(),
-                            color: Colors.blueAccent,
-                            onPressed: () => {_onAccepetOrder()},
-                            child: Text(
-                              "Accept",
-                              style: TextStyle(color: Colors.white),
-                            )),
+                        Expanded(
+                          child: MaterialButton(
+                              color: Colors.blueAccent,
+                              onPressed: () {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(20)),
+                                          title: Text('Confirm Accept Order'),
+                                          content: Text(
+                                              'Do you want accept the order?'),
+                                          actions: [
+                                            MaterialButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                  setState(() {
+                                                    _onAccepetOrder();
+                                                    Navigator.of(context)
+                                                        .pushAndRemoveUntil(
+                                                            MaterialPageRoute(
+                                                                builder:
+                                                                    (context) =>
+                                                                        MainScreen(
+                                                                          user:
+                                                                              widget.user,
+                                                                        )),
+                                                            (Route<dynamic>
+                                                                    route) =>
+                                                                false);
+                                                  });
+                                                },
+                                                child: Text('Yes')),
+                                            MaterialButton(
+                                              onPressed: () => {
+                                                Navigator.of(context).pop(false)
+                                              },
+                                              child: Text('No'),
+                                            )
+                                          ],
+                                        ));
+                              },
+                              child: Text(
+                                "Accept",
+                                style: TextStyle(color: Colors.white),
+                              )),
+                        ),
                         SizedBox(width: 5),
-                        MaterialButton(
-                            shape: Border.all(),
-                            color: Colors.redAccent,
-                            onPressed: () => {_onRejectOrder()},
-                            child: Text("Reject",
-                                style: TextStyle(color: Colors.white))),
+                        Expanded(
+                          child: MaterialButton(
+                              color: Colors.redAccent,
+                              onPressed: () => {_onRejectOrder()},
+                              child: Text("Reject",
+                                  style: TextStyle(color: Colors.white))),
+                        ),
                       ],
                     ),
                     SizedBox(height: 8),
@@ -216,24 +260,35 @@ class _OrderDetailState extends State<OrderDetail> {
     );
   }
 
-  _onAccepetOrder() {
+  _onAccepetOrder() async {
+    ProgressDialog pr = ProgressDialog(context,
+        isDismissible: true, type: ProgressDialogType.Normal);
+    pr.style(message: 'Loading');
+    pr.show();
     if (widget.user.phone == null || int.parse(widget.user.phone) < 6) {
       Toast.show('You must have a valid phone', context,
           duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       return null;
     }
-    http.post(server + "/php/accept_order.php", body: {
+    await http.post(server + "/php/accept_order.php", body: {
       'orderid': widget.order.orderid,
       'email': widget.user.email,
       'foodid': widget.order.orderfood,
-      'phone': widget.user.phone
+      'phone': widget.user.phone,
+      'method': widget.order.method,
+      'total': widget.order.price
     }).then((res) {
       print(res.body);
       if (res.body == 'fail') {
         Toast.show('error', context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       } else {
-        _showSuccess();
+        Future.delayed(Duration(seconds: 2)).then((value) {
+          pr.hide().whenComplete(() {
+            print(pr.isShowing());
+            _showSuccess();
+          });
+        });
       }
     }).catchError((err) {
       print(err);
@@ -245,7 +300,6 @@ class _OrderDetailState extends State<OrderDetail> {
       'orderid': widget.order.orderid,
       'email': widget.user.email,
       'foodid': widget.order.orderfood,
-     
     }).then((res) {
       print(res.body);
     }).catchError((err) {
@@ -257,11 +311,12 @@ class _OrderDetailState extends State<OrderDetail> {
 
   void _loadOrder() {}
 
-  void _showSuccess() {
-    showDialog(
+  void _showSuccess()async {
+    print('enter success');
+   await showDialog(
         context: context,
         builder: (BuildContext context) {
-          return CupertinoAlertDialog(
+         return CupertinoAlertDialog(
             title: const Text('Accepted successfully'),
             content: Icon(
               Icons.check_circle_outline,
@@ -269,7 +324,6 @@ class _OrderDetailState extends State<OrderDetail> {
             actions: <Widget>[
               CupertinoDialogAction(
                   onPressed: () {
-                    Navigator.of(context).pop(false);
                     Navigator.of(context).pop(false);
                   },
                   child: Text('Ok'))

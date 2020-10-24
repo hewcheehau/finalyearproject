@@ -14,10 +14,32 @@ class DeliverFood extends StatefulWidget {
 }
 
 class _DeliverFoodState extends State<DeliverFood> {
+  String server = "http://lawlietaini.com/hewdeliver";
+  double screenHeight, screenWidth;
+
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      
-    );
-  }
+  void initState(){
+    super.initState();
+    _loadEarn();
+      }
+    
+    
+      @override
+      Widget build(BuildContext context) {
+        screenHeight = MediaQuery.of(context).size.height;
+        screenWidth = MediaQuery.of(context).size.width;
+        return Scaffold(
+          appBar: AppBar(title: Text('My Earn',style: TextStyle(letterSpacing: 0.7),),
+          backgroundColor: Colors.blueAccent,),
+    
+          body: Container(
+    
+          ),
+        );
+      }
+    
+      void _loadEarn() {
+
+        
+      }
 }

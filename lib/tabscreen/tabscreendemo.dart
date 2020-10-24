@@ -52,7 +52,6 @@ class _MainPageState extends State<MainPage> {
     _loadCart();
     //init();
 
-
     if (widget.user.type == 'Food Provider') {
       _isFoodprovider = true;
     }
@@ -63,7 +62,6 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
     TextEditingController _foodController = new TextEditingController();
@@ -73,39 +71,41 @@ class _MainPageState extends State<MainPage> {
         title: Row(
           children: <Widget>[
             Text(
-          'TodayFood',
-          style: TextStyle(color: Colors.black87,fontSize: 25),
-        ),
-         
-        
+              'TodayFood',
+              style: TextStyle(color: Colors.black87, fontSize: 25),
+            ),
           ],
         ),
-        
         backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
         actions: <Widget>[
           Container(
             padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
-            child: IconButton(icon: 
-            Badge(
-              alignment: Alignment.topRight,
-              showBadge: widget.user.quantity=='0'?false:true,
-              badgeContent: Text(widget.user.quantity??Text('0'),style:TextStyle(color: Colors.white,fontWeight: FontWeight.bold)),
-                        child: Icon(MdiIcons.cartOutline,
-              color: Colors.blueAccent,
-              size: 30,
-              
-              ),
-            ), onPressed: (){
-              if(widget.user.name == 'unregistered'){
-                Toast.show('Please register/login', context,duration:Toast.LENGTH_LONG,gravity:Toast.BOTTOM);
-                return;
-              }
-               Navigator.push(context, MaterialPageRoute(builder: (context)=>CartPage(user:widget.user)));
-            }),
+            child: IconButton(
+                icon: Badge(
+                  alignment: Alignment.topRight,
+                  showBadge: widget.user.quantity == '0' ? false : true,
+                  badgeContent: Text(widget.user.quantity ?? Text('0'),
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold)),
+                  child: Icon(
+                    MdiIcons.cartOutline,
+                    color: Colors.blueAccent,
+                    size: 30,
+                  ),
+                ),
+                onPressed: () {
+                  if (widget.user.name == 'unregistered') {
+                    Toast.show('Please register/login', context,
+                        duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+                    return;
+                  }
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => CartPage(user: widget.user)));
+                }),
           )
-      
-         
         ],
       ),
       body: SafeArea(
@@ -134,7 +134,6 @@ class _MainPageState extends State<MainPage> {
                             flex: 10,
                             child: Container(
                               decoration: BoxDecoration(
-                              
                                   borderRadius: BorderRadius.circular(5.0),
                                   shape: BoxShape.rectangle,
                                   border:
@@ -204,7 +203,6 @@ class _MainPageState extends State<MainPage> {
                               children: <Widget>[
                                 FlatButton(
                                     onPressed: () => _sortFood("Recent"),
-                                    
                                     child: Column(
                                       children: <Widget>[
                                         Icon(
@@ -212,18 +210,15 @@ class _MainPageState extends State<MainPage> {
                                           color: Colors.blue[300],
                                           size: 35,
                                         ),
-                                     
                                       ],
                                     )),
                               ],
                             ),
-                            
                             SizedBox(width: 3),
                             Column(
                               children: <Widget>[
                                 FlatButton(
                                     onPressed: () => _sortFood("Popular"),
-                                    
                                     child: Column(
                                       children: <Widget>[
                                         Icon(
@@ -231,7 +226,6 @@ class _MainPageState extends State<MainPage> {
                                           color: Colors.blue[300],
                                           size: 35,
                                         ),
-                                       
                                       ],
                                     )),
                               ],
@@ -241,7 +235,6 @@ class _MainPageState extends State<MainPage> {
                               children: <Widget>[
                                 FlatButton(
                                     onPressed: () => _sortFood("Recent"),
-                                    
                                     child: Column(
                                       children: <Widget>[
                                         Icon(
@@ -249,7 +242,6 @@ class _MainPageState extends State<MainPage> {
                                           color: Colors.blue[300],
                                           size: 35,
                                         ),
-                                       
                                       ],
                                     )),
                               ],
@@ -259,7 +251,6 @@ class _MainPageState extends State<MainPage> {
                               children: <Widget>[
                                 FlatButton(
                                     onPressed: () => _sortFood("Recent"),
-                                    
                                     child: Column(
                                       children: <Widget>[
                                         Icon(
@@ -267,14 +258,11 @@ class _MainPageState extends State<MainPage> {
                                           color: Colors.blue[300],
                                           size: 35,
                                         ),
-                                        
                                       ],
                                     )),
                               ],
                             ),
                             SizedBox(width: 3),
-                   
-                            
                           ],
                         ),
                       ),
@@ -295,7 +283,7 @@ class _MainPageState extends State<MainPage> {
                         ],
                       )),
                       Container(
-                        padding: EdgeInsets.only(left:15,right:15),
+                        padding: EdgeInsets.only(left: 15, right: 15),
                         child: Text(
                           curItem,
                           style: TextStyle(
@@ -304,7 +292,7 @@ class _MainPageState extends State<MainPage> {
                               color: Colors.blueGrey),
                         ),
                       ),
-                       Expanded(
+                      Expanded(
                           child: Column(
                         children: <Widget>[
                           Divider(
@@ -359,22 +347,20 @@ class _MainPageState extends State<MainPage> {
                           childAspectRatio: (screenWidth / screenHeight) / 0.37,
                           children: List.generate(itemdata.length, (index) {
                             return Container(
-                              
                               decoration:
-                                  BoxDecoration(shape: BoxShape.rectangle
-                                  
-                                  ),
+                                  BoxDecoration(shape: BoxShape.rectangle),
                               child: Card(
                                 elevation: 5,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadiusDirectional.circular(15)
-                                ),
+                                    borderRadius:
+                                        BorderRadiusDirectional.circular(15)),
                                 child: Padding(
                                     padding: EdgeInsets.all(5),
                                     child: Column(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: <Widget>[
                                         GestureDetector(
                                           onTap: () => _onFoodDetail(
@@ -421,40 +407,48 @@ class _MainPageState extends State<MainPage> {
                                             ),
                                           ),
                                         ),
-                                      Row(
-                                       
-                                        children: [
-                                          Expanded(
-                                            flex: 3,
-                                                                                      child: Text(
-                                                    itemdata[index]['foodname'],
-                                                    maxLines: 2,
-                                                    style: TextStyle(
-                                                        fontWeight: FontWeight.w600,
-                                                        fontSize: 20,
-                                                        letterSpacing: 0.3),
-                                                  
-                                                
-                                             ),
-                                          ),
-                                     
-                                         Expanded(
-                                           flex: 1,
-                                           child: Padding(
-                                             padding: const EdgeInsets.all(5.0),
-                                             child: Row(
-                                             children: [
-                                               Text('RM ',style: TextStyle(fontSize:18),),
-                                               Text(itemdata[index]['price'].toString(),style: TextStyle(fontSize:20,fontWeight: FontWeight.bold),),
-                                             ],
-                                         ),
-                                           ))
-                                        ],
-                                      ),
-                                       SizedBox(height: 5),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              flex: 3,
+                                              child: Text(
+                                                itemdata[index]['foodname'],
+                                                maxLines: 2,
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 20,
+                                                    letterSpacing: 0.3),
+                                              ),
+                                            ),
+                                            Expanded(
+                                                flex: 1,
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(5.0),
+                                                  child: Row(
+                                                    children: [
+                                                      Text(
+                                                        'RM ',
+                                                        style: TextStyle(
+                                                            fontSize: 18),
+                                                      ),
+                                                      Text(
+                                                        itemdata[index]['price']
+                                                            .toString(),
+                                                        style: TextStyle(
+                                                            fontSize: 20,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ))
+                                          ],
+                                        ),
+                                        SizedBox(height: 5),
                                         Text(
-                                          "From " +
-                                              itemdata[index]['foodshop'],
+                                          "From " + itemdata[index]['foodshop'],
                                           maxLines: 1,
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold,
@@ -465,7 +459,8 @@ class _MainPageState extends State<MainPage> {
                                             ? Row(
                                                 children: <Widget>[
                                                   Icon(Icons.star_border,
-                                                      color: Colors.amber)
+                                                      color: Colors.amber),
+                                                      Text(' (0)')
                                                 ],
                                               )
                                             : Row(
@@ -479,35 +474,9 @@ class _MainPageState extends State<MainPage> {
                                                     Text(itemdata[index]
                                                         ['foodrating'])
                                                   ]),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            5.0),
-                                                    child: Column(
-                                                      children: <Widget>[
-                                                        Row(
-                                                          children: <Widget>[
-                                                            Icon(Icons.attach_money),
-                                                            Text("RM ",
-                                                                style: TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold)),
-                                                            Text(
-                                                              "${priceFood = 1.5 + double.parse(itemdata[index]['price'])}",
-                                                              style: TextStyle(
-                                                                  fontSize: 20,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w800),
-                                                            )
-                                                          ],
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
                                                 ],
                                               ),
+                                              
                                       ],
                                     )),
                               ),
@@ -520,7 +489,7 @@ class _MainPageState extends State<MainPage> {
           ),
         ),
       ),
-   /*   floatingActionButton: FloatingActionButton.extended(
+      /*   floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           Navigator.push(context, MaterialPageRoute(builder: (context)=>CartPage(user:widget.user)));
         },
@@ -567,6 +536,7 @@ class _MainPageState extends State<MainPage> {
         setState(() {
           var extractdata = json.decode(res.body);
           itemdata = extractdata["food"];
+          curItem = "Recent";
         });
       }
     }).catchError((err) {
@@ -679,7 +649,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   _onFoodDetail(itemdata, itemdata2, itemdata3, itemdata4, itemdata5, itemdata6,
-      itemdata7, itemdata8,itemdata9,itemdata10) {
+      itemdata7, itemdata8, itemdata9, itemdata10) {
     Food food = new Food(
         id: itemdata,
         name: itemdata2,
@@ -702,14 +672,14 @@ class _MainPageState extends State<MainPage> {
 
   Future init() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    if(widget.user.quantity!="0"){
-        _visible = true;
+    if (widget.user.quantity != "0") {
+      _visible = true;
     }
   }
 
   void _loadCart() async {
     String urlLoadCart = server + "/php/load_cart.php";
-    if(widget.user.name =='unregistered'){
+    if (widget.user.name == 'unregistered') {
       return;
     }
     http.post(urlLoadCart, body: {

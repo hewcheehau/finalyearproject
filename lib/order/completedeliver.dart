@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fypv1/main.dart';
 import 'package:http/http.dart' as http;
 import 'package:fypv1/user.dart';
 import 'package:fypv1/deliver.dart';
@@ -32,79 +33,101 @@ class _CompleteDeliverScreenState extends State<CompleteDeliverScreen> {
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Delivery detail'),
-        centerTitle: true,
-        backgroundColor: Colors.blueAccent,
-      ),
-      body: Center(
-        child: Column(
-          children: [
-            Text('Deliver:' + widget.deliver.taskid),
-            GestureDetector(
-              onTap: () => {_choose()},
-              child: Container(
-                height: screenHeight / 3.5,
-                width: screenWidth / 1.8,
-                decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: _image == null
-                          ? AssetImage(pathAsset)
-                          : FileImage(_image),
-                      fit: BoxFit.cover,
+    return WillPopScope(
+      onWillPop: _goBackPrevious,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Delivery detail'),
+          centerTitle: true,
+          backgroundColor: Colors.blueAccent,
+        ),
+        body: Center(
+          child: Column(
+            children: [
+              SizedBox(height: 10),
+              Align(
+                  alignment: Alignment.topLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      '#Deliver:' + widget.deliver.taskid,
+                      style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    border: Border.all(
-                      width: 3.0,
-                      color: Colors.blueAccent,
-                    ),
-                    borderRadius: BorderRadius.all(Radius.circular(5.0))),
-              ),
-            ),
-            SizedBox(
-              height: 5,
-            ),
-            Text('(Upload photo)'),
-            SizedBox(height: 12),
-            MaterialButton(
-                minWidth: 250,
-                color: Colors.blueAccent,
-                onPressed: () => {},
-                child: Text(
-                  "Add photo",
-                  style: TextStyle(color: Colors.white),
-                )),
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.rectangle,
+                  )),
+              SizedBox(height: 10),
+              GestureDetector(
+                onTap: () => {_choose()},
+                child: Container(
+                  height: screenHeight / 3.5,
+                  width: screenWidth / 1.8,
+                  decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: _image == null
+                            ? AssetImage(pathAsset)
+                            : FileImage(_image),
+                        fit: BoxFit.cover,
+                      ),
+                      border: Border.all(
+                        width: 3.0,
+                        color: Colors.blueAccent,
+                      ),
+                      borderRadius: BorderRadius.all(Radius.circular(5.0))),
                 ),
-                padding: EdgeInsets.all(15.0),
-                child: TextFormField(
-                  focusNode: _focus0,
-                  controller: _note,
-                  maxLines: 3,
-                  onFieldSubmitted: (value) {
-                    FocusScope.of(context).requestFocus(_focus1);
-                  },
-                  textInputAction: TextInputAction.done,
-                  decoration: InputDecoration(
-                    hintText: 'Add note',
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              Text('Upload photo (optional)'),
+              SizedBox(height: 12),
+              MaterialButton(
+                  minWidth: 250,
+                  color: Colors.blueAccent,
+                  onPressed: () => {_choose()},
+                  child: Text(
+                    "Add photo",
+                    style: TextStyle(color: Colors.white),
+                  )),
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.rectangle,
+                  ),
+                  padding: EdgeInsets.all(15.0),
+                  child: TextFormField(
+                    focusNode: _focus0,
+                    controller: _note,
+                    maxLines: 3,
+                    onFieldSubmitted: (value) {
+                      FocusScope.of(context).requestFocus(_focus1);
+                    },
+                    textInputAction: TextInputAction.done,
+                    decoration: InputDecoration(
+                      hintText: 'Add note (optional)',
+                    ),
                   ),
                 ),
               ),
-            ),
-            Flexible(
-                child: MaterialButton(
-              minWidth: 250,
-              color: Colors.blueAccent,
-              onPressed: () => {_onCompleteFood()},
-              child: Text(
-                'Complete',
-                style: TextStyle(color: Colors.white),
-              ),
-            ))
-          ],
+              Flexible(
+                  child: MaterialButton(
+                minWidth: 250,
+                color: Colors.blueAccent,
+                onPressed: () {
+                  _onCompleteFood();
+
+                  Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                          builder: (context) => MainScreen(
+                                user: widget.user,
+                              )),
+                      (Route<dynamic> route) => false);
+                },
+                child: Text(
+                  'Complete',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ))
+            ],
+          ),
         ),
       ),
     );
@@ -163,9 +186,10 @@ class _CompleteDeliverScreenState extends State<CompleteDeliverScreen> {
     String _isfinish = 'reach';
     http.post(server + "/php/update_deliver.php", body: {
       'email': widget.user.email,
-      'note': _note.toString(),
+      'note': _note.text,
       'current': _isfinish,
-      'orderid': widget.deliver.orderid
+      'orderid': widget.deliver.orderid,
+      'taskid': widget.deliver.taskid
     }).then((res) {
       if (res.body == 'success') {
         _showSuccess();
@@ -173,8 +197,8 @@ class _CompleteDeliverScreenState extends State<CompleteDeliverScreen> {
     });
   }
 
-  void _showSuccess() {
-    showDialog(
+  void _showSuccess() async {
+    await showDialog(
         context: context,
         builder: (BuildContext context) {
           return CupertinoAlertDialog(
@@ -186,11 +210,40 @@ class _CompleteDeliverScreenState extends State<CompleteDeliverScreen> {
               CupertinoDialogAction(
                   onPressed: () {
                     Navigator.of(context).pop(false);
-                    Navigator.of(context).pop(false);
                   },
                   child: Text('Ok'))
             ],
           );
         });
+  }
+
+  Future<bool> _goBackPrevious() async {
+    return showDialog(
+            context: context,
+            builder: (context) => new AlertDialog(
+                  title: new Text("Are you sure?"),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
+                  content: new Text("Are you sure to back?"),
+                  actions: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: new GestureDetector(
+                        onTap: () => Navigator.of(context).pop(false),
+                        child: Text('No'),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: new GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).pop(true);
+                        },
+                        child: Text('Yes'),
+                      ),
+                    )
+                  ],
+                )) ??
+        false;
   }
 }

@@ -46,6 +46,7 @@ class _DeliverDetailState extends State<DeliverDetail> {
         actions: [
           IconButton(icon: Icon(Icons.delete_forever_rounded), onPressed: () {})
         ],
+        leading: IconButton(icon: Icon(Icons.remove), onPressed: ()=>{Navigator.of(context).pop(true)}),
       ),
       body: Container(
         height: screenHeight * 100,
@@ -235,6 +236,20 @@ class _DeliverDetailState extends State<DeliverDetail> {
                                       fontWeight: FontWeight.bold),
                                 ))
                               ]),
+                                 TableRow(children: [
+                                TableCell(
+                                    child: Text(
+                                  "Cust Address : ",
+                                  style: TextStyle(fontSize: 18),
+                                )),
+                                TableCell(
+                                    child: Text(
+                                  "${widget.deliver.address}",
+                                  style: TextStyle(
+                                      fontSize: 18.0,
+                                      fontWeight: FontWeight.bold),
+                                ))
+                              ]),
                             ],
                           ),
                         ),
@@ -275,11 +290,11 @@ class _DeliverDetailState extends State<DeliverDetail> {
                                                     BorderRadius.circular(20)),
                                             color: Colors.blueAccent,
                                             onPressed: () => {
-                                                  Navigator.pushReplacement(
+                                                  Navigator.push(
                                                       context,
                                                       MaterialPageRoute(
                                                           builder: (context) =>
-                                                              CompleteDeliverScreen(user: widget.user,deliver: widget.deliver,)))
+                                                              CompleteDeliverScreen(user: widget.user,deliver: widget.deliver,))).then((value) => setState((){}))
                                                 },
                                             child: Text('Complete Delivery',
                                                 style: TextStyle(
@@ -403,7 +418,7 @@ class _DeliverDetailState extends State<DeliverDetail> {
   void _showSuccessful() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setInt('assign', 1);
-    showDialog(
+    await showDialog(
         context: context,
         builder: (BuildContext context) {
           return CupertinoAlertDialog(
@@ -414,13 +429,14 @@ class _DeliverDetailState extends State<DeliverDetail> {
             actions: <Widget>[
               CupertinoDialogAction(
                   onPressed: () {
-                    Navigator.of(context).pop(false);
+                   
                     Navigator.of(context).pop(false);
                   },
                   child: Text('Ok'))
             ],
           );
         });
+        Navigator.of(context).pop(true);
   }
 
   _onCompletePickup() {
@@ -436,11 +452,12 @@ class _DeliverDetailState extends State<DeliverDetail> {
       'orderid': widget.deliver.orderid
     }).then((res) {
       if (res.body == 'success') {
+          _showSuccessPick();
         Future.delayed(Duration(seconds: 2)).then((value) => {
               pr.hide().whenComplete(() => {print(pr.isShowing())})
             });
         _current = 'Delivering food to customers';
-        _showSuccessPick();
+      
         setState(() {});
       }else{
         print(res.body);
@@ -468,5 +485,6 @@ class _DeliverDetailState extends State<DeliverDetail> {
                     onPressed: () => {Navigator.of(context).pop()})
               ],
             ));
+            
   }
 }

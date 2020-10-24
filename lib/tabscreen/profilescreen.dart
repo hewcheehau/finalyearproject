@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fypv1/creditinfo.dart';
 import 'package:fypv1/login.dart';
 import 'package:fypv1/splashscreen.dart';
 import 'package:fypv1/user.dart';
@@ -6,8 +7,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:fypv1/configsize.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 import 'dart:convert';
@@ -15,8 +16,10 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'profiledetail.dart';
+import 'package:fypv1/feedback.dart';
 
 final _picker = ImagePicker();
+int number = 0;
 
 class ProfileScreen extends StatefulWidget {
   final User user;
@@ -97,14 +100,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             letterSpacing: 1.5)),
                   ),
                   Container(
-                  
                       decoration: BoxDecoration(
-                        color: Colors.transparent,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(50),
-                          bottomLeft: Radius.circular(50)
-                        )
-                      ),
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(50),
+                              bottomLeft: Radius.circular(50))),
                       padding: EdgeInsets.all(12.0),
                       child: Text(
                         widget.user.type,
@@ -271,7 +271,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
                             Expanded(
-                                                          child: Text(
+                              child: Text(
                                 'Switch Account Type',
                                 style: TextStyle(
                                     color: Colors.white,
@@ -287,7 +287,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                   ),
-                
                 ],
               ),
 
@@ -458,7 +457,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ],
           ),
         ),
-         
         Container(
           margin: EdgeInsets.only(top: 450.0),
           decoration: BoxDecoration(
@@ -484,7 +482,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: Card(
                           elevation: 5,
                           child: MaterialButton(
-                            onPressed: () {},
+                            onPressed: ()=> {Navigator.push(context, MaterialPageRoute(builder: (context)=>CreditInfo(user: widget.user,))).then((value) => setState((){}))},
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
@@ -507,21 +505,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           elevation: 5,
                           child: MaterialButton(
                             onPressed: () {
-                              if(widget.user.email == 'unregistered'){
-                                Toast.show('Please register/login', context,duration: Toast.LENGTH_LONG,gravity: Toast.BOTTOM);
+                              if (widget.user.email == 'unregistered') {
+                                Toast.show('Please register/login', context,
+                                    duration: Toast.LENGTH_LONG,
+                                    gravity: Toast.BOTTOM);
                                 return;
                               }
                               Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          ProfileDetail(user: widget.user))).then((value) => setState((){}));
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              ProfileDetail(user: widget.user)))
+                                  .then((value) => setState(() {}));
                             },
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
                                 Icon(
-                                  Icons.person_outline,
+                                  Icons.settings,
                                   size: 35,
                                   color: Colors.blueGrey[300],
                                 ),
@@ -535,16 +536,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: Card(
                           elevation: 5,
                           child: MaterialButton(
-                            onPressed: () {},
+                            onPressed: () => {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          FeedBackScreen(user: widget.user)))
+                            },
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
                                 Icon(
-                                  Icons.settings,
+                                  Icons.history_outlined,
                                   size: 35,
                                   color: Colors.blue,
                                 ),
-                                Text('Settings')
+                                Text('History')
                               ],
                             ),
                           ),
@@ -605,14 +612,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Navigator.pop(context);
                     Hero(
                       tag: 'Profile Picture',
-                      child: Image.network(
-                          server + "/profile/${widget.user.email}.jpg?"),
+                      child: Image.network(server +
+                          "/profile/${widget.user.email}.jpg?dummy=${(number)}'"),
                     );
                     Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => DetailScreen(user: widget.user),
                         ));
+                    setState(() {});
                   },
                 ),
                 Divider(
@@ -802,8 +810,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  void _onSwapAccount() {
+  void _onSwapAccount() async {
     String type1, type2;
+    ProgressDialog pr = ProgressDialog(context,
+        isDismissible: true, type: ProgressDialogType.Normal);
+    pr.style(message: 'Changing...');
 
     if (widget.user.name == 'unregistered') {
       Toast.show('Please register/login', context,
@@ -817,52 +828,69 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   Row(
                     children: <Widget>[
-                       Text('Select Account Type'),
-                       Icon(Icons.swap_horiz)
+                      Text('Select Account Type'),
+                      Icon(Icons.swap_horiz)
                     ],
                   ),
-                  SizedBox(height:5),
-                  Text("Current :"+widget.user.type,style: TextStyle(fontSize:17,color:Colors.grey),)
+                  SizedBox(height: 5),
+                  Text(
+                    "Current :" + widget.user.type,
+                    style: TextStyle(fontSize: 17, color: Colors.grey),
+                  )
                 ],
               ),
-              
               backgroundColor: Colors.grey[30],
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10)),
               children: <Widget>[
-                
                 Visibility(
                   visible: _isFoodBuyer,
                   child: SimpleDialogOption(
                     onPressed: () {
-                      
-                            showDialog(context: context,builder:(context)=>AlertDialog(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)
-                        ),
-                        title: Text('Change to Food buyer mode?'),
-                        actions: <Widget>[
-                          MaterialButton(onPressed: (){
-                            
-                            String type= 'Food Buyer';
-                            http.post(server+'/php/update_profile.php',body: {
-                              'email':widget.user.email,
-                              'type' : type,
-                            }).then((res) {
-                              if(res.body=='success'){
-                                setState(() {
-                                  
-                                });
-                                Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>SplashScreen()), (Route<dynamic>route) => false);
-                              }
-                            });
-
-                          },
-                          child: Text('Yes'),),
-                           MaterialButton(onPressed: ()=>{Navigator.of(context).pop()},
-                          child: Text('No'),),
-                        ],
-                      ));
+                      showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10)),
+                                title: Text('Change to Food buyer mode?'),
+                                actions: <Widget>[
+                                  MaterialButton(
+                                    onPressed: () {
+                                      pr.show();
+                                      String type = 'Food Buyer';
+                                      http.post(
+                                          server + '/php/update_profile.php',
+                                          body: {
+                                            'email': widget.user.email,
+                                            'type': type,
+                                          }).then((res) {
+                                        if (res.body == 'success') {
+                                          setState(() {});
+                                          Future.delayed(Duration(seconds: 2))
+                                              .then((value) {
+                                            pr.hide().whenComplete(
+                                                () => {print(pr.isShowing())});
+                                          });
+                                          Navigator.of(context)
+                                              .pushAndRemoveUntil(
+                                                  MaterialPageRoute(
+                                                      builder:
+                                                          (context) =>
+                                                              SplashScreen()),
+                                                  (Route<dynamic> route) =>
+                                                      false);
+                                        }
+                                      });
+                                    },
+                                    child: Text('Yes'),
+                                  ),
+                                  MaterialButton(
+                                    onPressed: () =>
+                                        {Navigator.of(context).pop()},
+                                    child: Text('No'),
+                                  ),
+                                ],
+                              ));
                     },
                     child: Text('Food Buyer'),
                   ),
@@ -875,31 +903,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       setState(() {
                         _isLoading = true;
                       });
-                      showDialog(context: context,builder:(context)=>AlertDialog(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)
-                        ),
-                        title: Text('Change to transporter mode?'),
-                        actions: <Widget>[
-                          MaterialButton(onPressed: (){
-                            
-                            String type= 'Transporter';
-                            http.post(server+'/php/update_profile.php',body: {
-                              'email':widget.user.email,
-                              'type' : type,
-                            }).then((res) {
-                              if(res.body=='success'){
-                             //   Navigator.of(context).pop();
-                               Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>SplashScreen()), (Route<dynamic>route) => false);
-                              }
-                            });
-
-                          },
-                          child: Text('Yes'),),
-                           MaterialButton(onPressed: ()=>{Navigator.of(context).pop()},
-                          child: Text('No'),),
-                        ],
-                      ));
+                      showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10)),
+                                title: Text('Change to transporter mode?'),
+                                actions: <Widget>[
+                                  MaterialButton(
+                                    onPressed: () {
+                                      String type = 'Transporter';
+                                      http.post(
+                                          server + '/php/update_profile.php',
+                                          body: {
+                                            'email': widget.user.email,
+                                            'type': type,
+                                          }).then((res) {
+                                        if (res.body == 'success') {
+                                          //   Navigator.of(context).pop();
+                                          Navigator.of(context)
+                                              .pushAndRemoveUntil(
+                                                  MaterialPageRoute(
+                                                      builder:
+                                                          (context) =>
+                                                              SplashScreen()),
+                                                  (Route<dynamic> route) =>
+                                                      false);
+                                        }
+                                      });
+                                    },
+                                    child: Text('Yes'),
+                                  ),
+                                  MaterialButton(
+                                    onPressed: () =>
+                                        {Navigator.of(context).pop()},
+                                    child: Text('No'),
+                                  ),
+                                ],
+                              ));
                     },
                     child: Text('Transporter'),
                   ),
@@ -908,47 +949,60 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Visibility(
                   visible: _isProvider,
                   child: SimpleDialogOption(
-
                     onPressed: () {
                       setState(() {
                         _isLoading = true;
                       });
-                      showDialog(context: context,builder:(context)=>AlertDialog(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)
-                        ),
-                        title: Text('Change to food provider mode?'),
-                        actions: <Widget>[
-                          MaterialButton(onPressed: (){
-                            
-                            String type= 'Food Provider';
-                            http.post(server+'/php/update_profile.php',body: {
-                              'email':widget.user.email,
-                              'type' : type,
-                            }).then((res) {
-                              if(res.body=='success'){
-                             //   Navigator.of(context).pop();
-                               Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>SplashScreen()), (Route<dynamic>route) => false);
-                              }
-                            });
-
-                          },
-                          child: Text('Yes'),),
-                           MaterialButton(onPressed: ()=>{Navigator.of(context).pop()},
-                          child: Text('No'),),
-                        ],
-                      ));
+                      showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10)),
+                                title: Text('Change to food provider mode?'),
+                                actions: <Widget>[
+                                  MaterialButton(
+                                    onPressed: () {
+                                      String type = 'Food Provider';
+                                      http.post(
+                                          server + '/php/update_profile.php',
+                                          body: {
+                                            'email': widget.user.email,
+                                            'type': type,
+                                          }).then((res) {
+                                        if (res.body == 'success') {
+                                          //   Navigator.of(context).pop();
+                                          Navigator.of(context)
+                                              .pushAndRemoveUntil(
+                                                  MaterialPageRoute(
+                                                      builder:
+                                                          (context) =>
+                                                              SplashScreen()),
+                                                  (Route<dynamic> route) =>
+                                                      false);
+                                        }
+                                      });
+                                    },
+                                    child: Text('Yes'),
+                                  ),
+                                  MaterialButton(
+                                    onPressed: () =>
+                                        {Navigator.of(context).pop()},
+                                    child: Text('No'),
+                                  ),
+                                ],
+                              ));
                     },
                     child: Text('Food Provider'),
                   ),
                 ),
-                  Divider(),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: OutlineButton(
-                      
-                      onPressed: ()=>{Navigator.of(context).pop()},child: Text('Exit'),),
-                  )
+                Divider(),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: OutlineButton(
+                    onPressed: () => {Navigator.of(context).pop()},
+                    child: Text('Exit'),
+                  ),
+                )
               ],
             ));
   }
@@ -965,6 +1019,21 @@ class DetailScreen extends StatefulWidget {
 class _DetailScreenState extends State<DetailScreen> {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.blueAccent,
+        centerTitle: true,
+        title: Text('Profile Picture'),
+      ),
+      body: Container(
+        child: Center(
+          child: Hero(
+            tag: 'Profile Picture',
+            child: Image.network(
+                "http://lawlietaini.com/hewdeliver/profile/${widget.user.email}.jpg?dummy=${(number)}'"),
+          ),
+        ),
+      ),
+    );
   }
 }

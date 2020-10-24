@@ -156,7 +156,7 @@ class _FoodDetailState extends State<FoodDetail> {
                                           ),
                                           Text(
                                             "at RM " +
-                                                "${foodPrice = 1.5 + double.parse(widget.food.price)}",
+                                                "${double.parse(widget.food.price)}",
                                             style: TextStyle(fontSize: 20),
                                           )
                                         ],

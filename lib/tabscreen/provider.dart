@@ -103,11 +103,12 @@ class _ProviderScreenState extends State<ProviderScreen> {
                             _foodAvailable = 'Food shop is unavailable';
                           }
                           String _isAvailable =
-                              server + "/php/load_foodprovide.php";
+                              server + "/php/update_foodstatus.php";
                           http.post(_isAvailable, body: {
                             'email': widget.user.email,
                             'setfood': _foodAvailable
                           }).then((res) {
+                            print(res.body);
                             if (res.body == 'nodata') {
                               setState(() {
                                 Toast.show('Failed to change', context,
@@ -241,8 +242,7 @@ class _ProviderScreenState extends State<ProviderScreen> {
                                                   itemdata[index]['foodrating'],
                                                   itemdata[index]['fooddate'],
                                                   itemdata[index]['foodimage'],
-                                                  itemdata[index]
-                                                      ['description'])
+                                                  itemdata[index]['description'])
                                             },
                                             onLongPress: _onDeleteItem,
                                             child: Column(
@@ -403,9 +403,11 @@ class _ProviderScreenState extends State<ProviderScreen> {
       } else {
         print('got data');
         print(res);
+        print(res.body);
         setState(() {
           var extractdata = json.decode(res.body);
           itemdata = extractdata["food"];
+
           _checkShop();
           _sortList();
         });
@@ -583,19 +585,25 @@ class _ProviderScreenState extends State<ProviderScreen> {
         available: n5,
         rating: n6,
         regdate: n7,
-        foodimage: n8);
+        foodimage: n8,
+        description: n9);
     Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) =>
-                FoodSellDetail(user: widget.user, food: food)));
+                FoodSellDetail(user: widget.user, food: food))).then((value) =>value?_getRequests():null );
   }
 
   void _checkShop() {
-    for (int i = 0; i < itemdata.length - 1; i++) {
-      if (itemdata[i]['available'] == "1") {
+     print('enter checkshop' +itemdata[0]['status']);
+      if(itemdata[0]['status']=='1'){
         _val = true;
+        _foodAvailable = 'Food shop is available';
       }
+    
     }
+     _getRequests()async{
+        _loadData();
   }
-}
+  }
+

@@ -6,6 +6,7 @@ import 'package:fypv1/food.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:http/http.dart' as http;
 import 'package:progress_dialog/progress_dialog.dart';
+import 'package:toast/toast.dart';
 
 class FoodSellDetail extends StatefulWidget {
   final User user;
@@ -279,7 +280,7 @@ class _FoodSellDetailState extends State<FoodSellDetail> {
                   width: double.infinity,
                   child: MaterialButton(
                       color: Colors.blueAccent,
-                      onPressed: () {},
+                      onPressed: () => {_updateProduct()},
                       child: Text(
                         'Save',
                         style: TextStyle(
@@ -325,11 +326,10 @@ class _FoodSellDetailState extends State<FoodSellDetail> {
                           Future.delayed(Duration(seconds: 2)).then((value) {
                             pr.hide().whenComplete(() {
                               print(pr.isShowing());
+                              _showSuccessInfo();
                             });
                           });
-                          setState(() {
-                            _showSuccessInfo();
-                          });
+                          setState(() {});
                         } else {}
                       }).catchError((err) {
                         print(err);
@@ -347,23 +347,75 @@ class _FoodSellDetailState extends State<FoodSellDetail> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Delete successfully'),
-            actions: <Widget>[
-              FlatButton(
-                child: Text('Ok', textAlign: TextAlign.center),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => MainScreen(
-                                user: widget.user,
-                              )),
-                      (route) => false);
-                },
-              )
-            ],
-          );
+              title: Column(
+                children: [
+                  Icon(Icons.remove_circle_outline),
+                  Text('Deleted successfully!'),
+                ],
+              ),
+              content: Container(
+                height: 50,
+                child: Align(
+                  alignment: Alignment.center,
+                  child: FlatButton(
+                    color: Colors.blueAccent,
+                    child: Text('Ok', textAlign: TextAlign.center),
+                    onPressed: () {
+                      Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => MainScreen(
+                                    user: widget.user,
+                                  )),
+                          (route) => false);
+                    },
+                  ),
+                ),
+              ));
         });
+  }
+
+  _updateProduct() {
+    ProgressDialog pr = ProgressDialog(context,
+        isDismissible: true, type: ProgressDialogType.Normal);
+    pr.style(message: 'Updating your food...');
+    pr.show();
+
+    String name = fname.text;
+    String description = ftype.text;
+    String price = fprice.text;
+    String quantity = fquantity.text;
+    String address = faddress.text;
+    if (name == null || price == null || quantity == null || address == null) {
+      Toast.show('Check your format', context,
+          duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+    }
+
+    http.post(server + "/php/update_food.php", body: {
+      'email': widget.user.email,
+      'name': name,
+      'description': description,
+      'quantity': quantity,
+      'price': price,
+      'address': address,
+      'id': widget.food.id
+    }).then((res) {
+      if (res.body == 'nodata') {
+        Toast.show('fail update', context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+        print(res.body);
+      } else {
+        Toast.show('Success updated', context,
+            duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
+        Navigator.pop(context, true);
+        setState(() {});
+      }
+      Navigator.pop(context, true);
+      Future.delayed(Duration(seconds: 2)).then((value) {
+        pr.hide().whenComplete(() => {print(pr.isShowing())});
+      });
+    }).catchError((err) {
+      print(err);
+    });
   }
 }

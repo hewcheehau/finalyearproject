@@ -631,6 +631,10 @@ class _CartPageState extends State<CartPage> {
                         SizedBox(width: 50),
                         MaterialButton(
                           onPressed: () {
+                            if(itemCart==null){
+                              Toast.show('No food in cart', context,duration:Toast.LENGTH_LONG,gravity:Toast.BOTTOM);
+                              return;
+                            }
                             if (_credit == false && _cashOnDelivery == false) {
                               _checkSelect = false;
                             } else {
@@ -819,7 +823,7 @@ class _CartPageState extends State<CartPage> {
                         borderRadius: BorderRadius.circular(20.0),
                       ),
                       height: 30,
-                      child: Text('Close'),
+                      child: Text('Close',style: TextStyle(color: Colors.white),),
                       color: Colors.lightBlue,
                       elevation: 10,
                       onPressed: () =>

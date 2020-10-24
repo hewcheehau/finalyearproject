@@ -24,7 +24,9 @@ class _TransporterScreenState extends State<TransporterScreen> {
   @override
   void initState() {
     super.initState();
-    _loadDeliver();
+    Future.delayed(Duration.zero,(){
+      this._loadDeliver();
+    });
   }
 
   @override
@@ -149,12 +151,8 @@ class _TransporterScreenState extends State<TransporterScreen> {
     );
   }
 
-  _loadDeliver(){
-    print('enter transporter');
-   
-
-
-    
+  Future<Null>_loadDeliver()async{
+    print('enter transporter'); 
     ProgressDialog pr = new ProgressDialog(context,
         isDismissible: true, type: ProgressDialogType.Normal);
     pr.style(message: 'Getting deliver order...');
@@ -201,6 +199,14 @@ class _TransporterScreenState extends State<TransporterScreen> {
           raider: itemdeliver11,
           status: itemdeliver12
         );
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>DeliverDetail(deliver: deliver,user: widget.user,)));
+       Navigator.push(context, MaterialPageRoute(builder: (context)=>DeliverDetail(deliver: deliver,user: widget.user,))).then((value)=>value?_getRequests():Null);
       }
+
+       _getRequests()async{
+         setState(() {
+           
+         });
+       await _loadDeliver();
+  }
+
 }
