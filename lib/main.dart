@@ -22,7 +22,7 @@ import 'package:flutter/services.dart';
 import 'dart:io';
 import 'tabscreen/orderdemo.dart';
 import 'package:fypv1/tabscreen/buyerorder.dart';
-import 'package:fypv1/tabscreen/deliverfood.dart';
+import 'package:fypv1/tabscreen/deliverearn.dart';
 
 class MainScreen extends StatefulWidget {
   final User user;

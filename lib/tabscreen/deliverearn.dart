@@ -21,6 +21,7 @@ class _DeliverFoodState extends State<DeliverFood> {
   void initState(){
     super.initState();
     _loadEarn();
+    print("enter earn");
       }
     
     
@@ -29,7 +30,10 @@ class _DeliverFoodState extends State<DeliverFood> {
         screenHeight = MediaQuery.of(context).size.height;
         screenWidth = MediaQuery.of(context).size.width;
         return Scaffold(
-          appBar: AppBar(title: Text('My Earn',style: TextStyle(letterSpacing: 0.7),),
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            centerTitle: true,
+            title: Text('My Earn',style: TextStyle(letterSpacing: 0.7),),
           backgroundColor: Colors.blueAccent,),
     
           body: Container(
@@ -39,7 +43,7 @@ class _DeliverFoodState extends State<DeliverFood> {
       }
     
       void _loadEarn() {
-
+          
         
       }
 }

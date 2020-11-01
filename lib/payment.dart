@@ -1,6 +1,9 @@
+import 'dart:ffi';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'user.dart';
 import 'dart:async';
@@ -39,7 +42,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   Completer<WebViewController> _controller = Completer<WebViewController>();
   String server = "http://lawlietaini.com/hewdeliver";
   double _progress = 0;
-  int _paid;
+  int _paid = 0;
   String userPhone = "";
   String _bill;
   Timer timer;
@@ -51,7 +54,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     super.initState();
     userPhone = widget.user.phone.toString().substring(1);
     print('userphone is ' + userPhone);
-
+  _bill = uuid.v1();
     //  _loadRespond();
   }
 
@@ -92,147 +95,118 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         ),
                       )
                     : Container(
-                        child: _paid == null
-                            ? Column(
-                                children: <Widget>[
-                                  CircularProgressIndicator(),
-                                  SizedBox(height: 15),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text('Please wait a moment...'),
-                                  )
-                                ],
-                              )
-                            : Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
+                        child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 20),
+                          Text(
+                            'Cash on delivery payment',
+                            style: TextStyle(fontSize: 25),
+                          ),
+                          SizedBox(height: 20),
+                         Padding(
+                            padding: const EdgeInsets.all(11.0),
+                            child: Container(
+                              child: Table(
+                                border: TableBorder.all(),
+                                defaultColumnWidth: FlexColumnWidth(1.0),
+                                columnWidths: {
+                                  0: FlexColumnWidth(3.5),
+                                  1: FlexColumnWidth(6.5)
+                                },
                                 children: [
-                                  SizedBox(height: 20),
-                                  Text(
-                                    'Cash on delivery payment',
-                                    style: TextStyle(fontSize: 25),
-                                  ),
-                                  SizedBox(height: 20),
-                                  Padding(
-                                    padding: const EdgeInsets.all(11.0),
-                                    child: Container(
-                                      child: Table(
-                                        border: TableBorder.all(),
-                                        defaultColumnWidth:
-                                            FlexColumnWidth(1.0),
-                                        columnWidths: {
-                                          0: FlexColumnWidth(3.5),
-                                          1: FlexColumnWidth(6.5)
-                                        },
-                                        children: [
-                                          TableRow(children: [
-                                            TableCell(
-                                                child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Text(
-                                                'Order id',
-                                              ),
-                                            )),
-                                            TableCell(
-                                                child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Text('${widget.orderid}'),
-                                            ))
-                                          ]),
-                                          TableRow(children: [
-                                            TableCell(
-                                                child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Text('Bill id'),
-                                            )),
-                                            TableCell(
-                                                child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Text(_bill),
-                                            ))
-                                          ]),
-                                          TableRow(children: [
-                                            TableCell(
-                                                child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Text('Email to'),
-                                            )),
-                                            TableCell(
-                                                child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child:
-                                                  Text('${widget.user.email}'),
-                                            ))
-                                          ]),
-                                          TableRow(children: [
-                                            TableCell(
-                                                child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Text('Amount to pay'),
-                                            )),
-                                            TableCell(
-                                                child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Text('RM ${widget.val}'),
-                                            ))
-                                          ]),
-                                          TableRow(children: [
-                                            TableCell(
-                                                child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Text('Payment Status'),
-                                            )),
-                                            TableCell(
-                                                child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Text('Unpaid'),
-                                            ))
-                                          ]),
-                                          TableRow(children: [
-                                            TableCell(
-                                                child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Text('Delivery option'),
-                                            )),
-                                            TableCell(
-                                                child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child:
-                                                  Text("${widget.methodpay}"),
-                                            ))
-                                          ]),
-                                          TableRow(children: [
-                                            TableCell(
-                                                child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Text('Date'),
-                                            )),
-                                            TableCell(
-                                                child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Text(
-                                                  formattedDate.toString()),
-                                            ))
-                                          ])
-                                        ],
+                                  TableRow(children: [
+                                    TableCell(
+                                        child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        'Order id',
                                       ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 15),
-                                  _progress == 1
+                                    )),
+                                    TableCell(
+                                        child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text('${widget.orderid}'),
+                                    ))
+                                  ]),
+                                  TableRow(children: [
+                                    TableCell(
+                                        child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text('Bill id'),
+                                    )),
+                                    TableCell(
+                                        child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(_bill),
+                                    ))
+                                  ]),
+                                  TableRow(children: [
+                                    TableCell(
+                                        child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text('Email to'),
+                                    )),
+                                    TableCell(
+                                        child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text('${widget.user.email}'),
+                                    ))
+                                  ]),
+                                  TableRow(children: [
+                                    TableCell(
+                                        child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text('Amount to pay'),
+                                    )),
+                                    TableCell(
+                                        child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text('RM ${widget.val}'),
+                                    ))
+                                  ]),
+                                  TableRow(children: [
+                                    TableCell(
+                                        child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text('Payment Status'),
+                                    )),
+                                    TableCell(
+                                        child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text('Unpaid'),
+                                    ))
+                                  ]),
+                                  TableRow(children: [
+                                    TableCell(
+                                        child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text('Delivery option'),
+                                    )),
+                                    TableCell(
+                                        child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text("${widget.methodpay}"),
+                                    ))
+                                  ]),
+                                  TableRow(children: [
+                                    TableCell(
+                                        child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text('Date'),
+                                    )),
+                                    TableCell(
+                                        child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(formattedDate.toString()),
+                                    ))
+                                  ])
+                                ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 15),
+                          /*   _progress == 1
                                       ? Container(
                                           child: Column(
                                             children: [
@@ -244,25 +218,24 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                             ],
                                           ),
                                         )
-                                      : Container(),
-                                  SizedBox(height: 15),
-                                  MaterialButton(
-                                    onPressed: () {
-                                      if (_progress == 0) {
-                                        _getQue();
-                                      }
-                                      _progress = 1;
-                                      _updatepayment();
-                                      setState(() {});
-                                    },
-                                    child: Text(
-                                      _progress == 0 ? 'Proceed' : 'Pending...',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    color: Colors.blueAccent,
-                                  )
-                                ],
-                              ))
+                                      :*/
+                          Container(),
+                          SizedBox(height: 15),
+                          MaterialButton(
+                            onPressed: () {
+                              _getQue();
+
+                              _updatepayment();
+                              setState(() {});
+                            },
+                            child: Text(
+                              'Confirm',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            color: Colors.blueAccent,
+                          )
+                        ],
+                      ))
               ],
             ),
           ),
@@ -272,7 +245,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   void _loadRespond() async {
-    _bill = uuid.v1();
+  
     http.post(server + "/php/update_cod.php", body: {
       'email': widget.user.email,
       'amount': widget.val,
@@ -347,6 +320,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   void _updatepayment() async {
+    ProgressDialog pr = new ProgressDialog(context,isDismissible: true,type: ProgressDialogType.Normal);
+    pr.style(message:"Updating payment...");
+    pr.show();
     http.post(server + "/php/payment_cod.php", body: {
       'email': widget.user.email,
       'amount': widget.val,
@@ -355,22 +331,29 @@ class _PaymentScreenState extends State<PaymentScreen> {
       'name': widget.user.name,
       'mobile': widget.user.phone,
       'method': widget.methodpay,
+      'address':widget.address
     }).then((res) {
-      if (res.body == 'success') {
-        print('order added');
-        _showResult();
-      } else {
+      if (res.body == 'payment fail') {
         print('failed pay:' + res.body);
+       
+      } else {
+         print('order added');
+       _showResult();
       }
+      Future.delayed(Duration(seconds: 2)).then((value) {
+        pr.hide().whenComplete(() => {
+          print(pr.isShowing())
+        });
+      });
     }).catchError((err) {
       print(err);
     });
   }
 
-  Future<void> _showResult() async {
+   Future<Void>_showResult() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     pref.setInt('payfood', 1);
-    await showDialog(
+      return await  showDialog(
         context: context,
         builder: (context) => AlertDialog(
               title: Text('Ordered successful.'),

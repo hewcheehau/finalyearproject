@@ -11,6 +11,7 @@ import 'dart:async';
 import 'package:timeline_tile/timeline_tile.dart';
 import 'package:fypv1/order.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:fypv1/main.dart';
 
 class BuyerOrderScreen extends StatefulWidget {
   final User user;
@@ -37,8 +38,9 @@ class _BuyerOrderScreenState extends State<BuyerOrderScreen> {
     super.initState();
     refreshKey = GlobalKey<RefreshIndicatorState>();
     this._loadOrder();
+    if(widget.user.email!="unregistered"){
     timer = new Timer.periodic(Duration(seconds: 5),
-        (Timer t) => _current == 'Order empty' ? print('wait') : loadValue());
+        (Timer t) => _current == 'Order empty' ? print('wait') : loadValue());}
   }
 
   @override
@@ -222,7 +224,9 @@ class _BuyerOrderScreenState extends State<BuyerOrderScreen> {
                                                                         body: {
                                                                           'email': widget
                                                                               .user
-                                                                              .email
+                                                                              .email,
+                                                                          'orderid':
+                                                                              itemorder[index]['id']
                                                                         }).then(
                                                                         (res) {
                                                                       print(res
@@ -622,21 +626,38 @@ class _BuyerOrderScreenState extends State<BuyerOrderScreen> {
                         Expanded(
                           child: MaterialButton(
                               minWidth: double.maxFinite,
-                              onPressed: () async {
-                                String order = itemorder[0]['id'];
-
-                                if (itemorder.isEmpty && itemraider.isEmpty) {
+                              onPressed: () {
+                                String order = itemorder[0]['id'] ?? "";
+                                List raider = itemraider ?? null;
+                                String status = itemorder[0]['status']??"";
+                                print(raider);
+                                if(widget.user.email=="unregistered"){
+                                  Toast.show('Please login', context,
+                                      duration: Toast.LENGTH_LONG,
+                                      gravity: Toast.BOTTOM);
+                                  return;
+                                }
+                                if (order == "" && raider == null) {
                                   Toast.show('No order', context,
                                       duration: Toast.LENGTH_LONG,
                                       gravity: Toast.BOTTOM);
                                   return;
                                 }
-                                if(itemraider.isEmpty){
-                                   Toast.show('No transpoter assign', context,
+                                if (raider == null) {
+                                  Toast.show('No transpoter assign', context,
                                       duration: Toast.LENGTH_LONG,
                                       gravity: Toast.BOTTOM);
                                   return;
                                 }
+                                if(status=="accepted"){
+
+                                    Toast.show('Not allow, please load', context,
+                                      duration: Toast.LENGTH_LONG,
+                                      gravity: Toast.BOTTOM);
+                                      _loadOrder();
+                                  return;
+                                }
+
                                 print('haha');
                                 showDialog(
                                     context: context,
@@ -750,6 +771,7 @@ class _BuyerOrderScreenState extends State<BuyerOrderScreen> {
   }
 
   void _goToReceiveOrder(String o) async {
+
     
     ProgressDialog pr = new ProgressDialog(context,
         isDismissible: true, type: ProgressDialogType.Normal);
@@ -769,7 +791,7 @@ class _BuyerOrderScreenState extends State<BuyerOrderScreen> {
             MaterialPageRoute(
                 builder: (context) => RateScreen(
                       user: widget.user,
-                      orderid: _orderid,
+                      orderid: o,
                     ))).then((value) => setState(() {}));
         setState(() {});
       } else {
@@ -811,7 +833,7 @@ class _RateScreenState extends State<RateScreen> {
               Icons.cancel_outlined,
               color: Colors.grey,
             ),
-            onPressed: () => {Navigator.of(context).pop(false)},
+            onPressed: () => {_goBackPage()},
           ),
         ),
         body: Container(
@@ -852,17 +874,21 @@ class _RateScreenState extends State<RateScreen> {
                 MaterialButton(
                     color: Colors.blue[700],
                     onPressed: () {
+                      ProgressDialog pr = new ProgressDialog(context,isDismissible: true, type: ProgressDialogType.Normal);
+                      pr.style(message:"Updating...");
+                      pr.show();
                       if (_rating == 0) {
                         Toast.show('Please rate', context,
                             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
                         return;
                       }
                       String rating = _rating.toString();
+                      print("your rate is " + rating);
                       http.post(
                           "http://lawlietaini.com/hewdeliver/php/rate_food.php",
                           body: {
                             'email': widget.user.email,
-                            'rate': rating,
+                           'rate': rating,
                             'orderid': widget.orderid
                           }).then((res) {
                         if (res.body == 'nodata') {
@@ -870,10 +896,26 @@ class _RateScreenState extends State<RateScreen> {
                               duration: Toast.LENGTH_LONG,
                               gravity: Toast.BOTTOM);
                         } else {
+
+                           Navigator.of(context)
+                                              .pushAndRemoveUntil(
+                                                  MaterialPageRoute(
+                                                      builder:
+                                                          (context) =>
+                                                              MainScreen(user: widget.user,)),
+                                                  (Route<dynamic> route) =>
+                                                      false);
+
                           Toast.show('success', context,
                               duration: Toast.LENGTH_LONG,
                               gravity: Toast.BOTTOM);
+                              
                         }
+                        Future.delayed(Duration(seconds: 2)).then((value) {
+                            pr.hide().whenComplete(() {
+                              print(pr.isShowing());
+                            });
+                        });
                       }).catchError((err) {
                         print(err);
                       });

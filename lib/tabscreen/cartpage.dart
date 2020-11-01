@@ -19,6 +19,9 @@ import 'package:random_string/random_string.dart';
 import 'package:fypv1/payment.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:fypv1/provider.dart';
+import 'package:uuid/uuid.dart';
+
+var uuid = Uuid();
 
 class CartPage extends StatefulWidget {
   final User user;
@@ -57,6 +60,7 @@ class _CartPageState extends State<CartPage> {
   String _methodpay = "";
   int _value = 1;
   TextEditingController _address = new TextEditingController();
+  String _billid = "";
 
   void firebaseListerners() {
     if (_tokenOwner == null || _tokenOwner == '') {
@@ -631,8 +635,10 @@ class _CartPageState extends State<CartPage> {
                         SizedBox(width: 50),
                         MaterialButton(
                           onPressed: () {
-                            if(itemCart==null){
-                              Toast.show('No food in cart', context,duration:Toast.LENGTH_LONG,gravity:Toast.BOTTOM);
+                            if (itemCart == null) {
+                              Toast.show('No food in cart', context,
+                                  duration: Toast.LENGTH_LONG,
+                                  gravity: Toast.BOTTOM);
                               return;
                             }
                             if (_credit == false && _cashOnDelivery == false) {
@@ -823,7 +829,10 @@ class _CartPageState extends State<CartPage> {
                         borderRadius: BorderRadius.circular(20.0),
                       ),
                       height: 30,
-                      child: Text('Close',style: TextStyle(color: Colors.white),),
+                      child: Text(
+                        'Close',
+                        style: TextStyle(color: Colors.white),
+                      ),
                       color: Colors.lightBlue,
                       elevation: 10,
                       onPressed: () =>
@@ -999,15 +1008,40 @@ class _CartPageState extends State<CartPage> {
     return orderid;
   }
 
-  void _updatePayment() {
-    if (_credit) {
-      _amountPayable = _amountPayable - double.parse(widget.user.credit);
-    }
+  
+
+  Future<void> _payusingCredit(double newamount) async {
+    print('enter pay credit');
+    _billid = uuid.v1();
+    ProgressDialog pr = new ProgressDialog(context,
+        isDismissible: true, type: ProgressDialogType.Normal);
+    pr.style(message: "Updating Cart...");
+    pr.show();
+    String urlPayment = server + "/php/payment_dcp1.php";
+    await http.post(urlPayment, body: {
+      'userid': widget.user.email,
+      'amount': _amountPayable.toStringAsFixed(2),
+      'orderid': generateOrderid(),
+      'newcr': newamount.toStringAsFixed(2),
+      'billid': _billid,
+      'address': curaddress
+    }).then((res) {
+      print(res.body);
+      Future.delayed(Duration(seconds: 2)).then((value) {
+        pr.hide().whenComplete(() {
+          print(pr.isShowing());
+        });
+      });
+      setState(() {
+        
+      });
+    }).catchError((err) {
+      print(err);
+    });
   }
 
-  Future<void> _payusingCredit(double newamount) async {}
-
   Future<void> makePayment() async {
+    print('enter make payment');
     String _curaddress;
 
     if (_value == 1) {
@@ -1015,8 +1049,13 @@ class _CartPageState extends State<CartPage> {
     } else {
       _curaddress = _address.text;
     }
+    if (_credit) {
+      _methodpay = "DCP";
+        _amountPayable = _amountPayable - double.parse(widget.user.credit);
+    }
 
     if (_amountPayable < 0) {
+      
       double newamount = _amountPayable * -1;
       await _payusingCredit(newamount);
       _loadCart();
@@ -1027,9 +1066,6 @@ class _CartPageState extends State<CartPage> {
       Toast.show('Cash On Delivery', context,
           duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       _methodpay = "COD";
-    }
-    if (_credit) {
-      _methodpay = "DCP";
     }
     var now = new DateTime.now();
     var formatter = new DateFormat('ddMMyyyy-');

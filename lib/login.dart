@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fypv1/resetpass.dart';
 import 'package:fypv1/selectRegister.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:http/http.dart' as http;
@@ -165,7 +166,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           padding: EdgeInsets.only(right: 45),
                           alignment: Alignment.centerRight,
                           child: GestureDetector(
-                            onTap: () {},
+                            onTap: () =>{Navigator.push(context, MaterialPageRoute(builder: (context)=>ResetPassword()))},
                             child: Text(
                               'Forgot Password?',
                               style: TextStyle(color: Colors.blue),

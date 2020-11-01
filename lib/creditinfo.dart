@@ -110,34 +110,34 @@ class _CreditInfoState extends State<CreditInfo> {
                   )
                 : Expanded(
                     child: GridView.count(
-                      mainAxisSpacing: 10,
+                      mainAxisSpacing: 5,
                       crossAxisCount: 1,
-                      childAspectRatio: (screenWidth / screenHeight) / 0.37,
+                      childAspectRatio: (screenWidth / screenHeight) / 0.10,
                       children: List.generate(itemcredit.length, (index) {
                         return Container(
-                          
-                          decoration: BoxDecoration(
-
-                          
-                          ),
+                          decoration: BoxDecoration(),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               itemcredit[index]['status'] == 'credit'
                                   ? Row(
                                       children: [
-                                         Icon(Icons.add,color: Colors.green,),
-                                        Text('RM ${itemcredit[index]['total']}'),
-                                        
-                                       
+                                        Icon(
+                                          Icons.add,
+                                          color: Colors.green,
+                                        ),
+                                        Text(
+                                            'RM ${itemcredit[index]['total']}'),
                                       ],
                                     )
                                   : Row(
                                       children: [
-                                         Icon(Icons.remove,color: Colors.redAccent,),
-                                        Text('RM ${itemcredit[index]['total']}'),
-                                          
-                                       
+                                        Icon(
+                                          Icons.remove,
+                                          color: Colors.redAccent,
+                                        ),
+                                        Text(
+                                            'RM ${itemcredit[index]['total']}'),
                                       ],
                                     )
                             ],
@@ -149,8 +149,12 @@ class _CreditInfoState extends State<CreditInfo> {
             MaterialButton(
               minWidth: double.infinity,
               onPressed: () => {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => BuyCredit(user: widget.user,)))
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => BuyCredit(
+                              user: widget.user,
+                            )))
               },
               child: Container(
                 width: double.infinity,
@@ -289,22 +293,47 @@ class _BuyCreditState extends State<BuyCredit> {
                               title: Text('Confirm your payment'),
                               content: Text('Are you sure to buy?'),
                               actions: [
-                                MaterialButton(onPressed: (){
-                                  String _method = 'DCP';
-                                  String _orderid = generateOrderid();
-                                  String _val = _amount.text;
-                                  if(_amount.text==''){
-                                    Toast.show('Please enter amount', context,duration:Toast.LENGTH_LONG,gravity:Toast.BOTTOM);
-                                    return;
-                                  }
-                                  if(double.parse(_amount.text) <=5){
-                                    Toast.show('Minimum amount RM5', context,duration:Toast.LENGTH_LONG,gravity:Toast.BOTTOM);
-                                    return;
-                                  }
-                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>PaymentScreen(user:widget.user,methodpay: _method,orderid: _orderid,val: _val,)));
-                                },
-                                child:Text('Yes, buy',style: TextStyle(color:Colors.blue),)),
-                                MaterialButton(onPressed: ()=>{Navigator.of(context).pop()},child:Text('No',style: TextStyle(color:Colors.red),))
+                                MaterialButton(
+                                    onPressed: () {
+                                      String _method = 'DCP';
+                                      String _orderid = generateOrderid();
+                                      String _val = _amount.text;
+                                      if (_amount.text == '') {
+                                        Toast.show(
+                                            'Please enter amount', context,
+                                            duration: Toast.LENGTH_LONG,
+                                            gravity: Toast.BOTTOM);
+                                        return;
+                                      }
+                                      if (double.parse(_amount.text) <= 5) {
+                                        Toast.show(
+                                            'Minimum amount RM5', context,
+                                            duration: Toast.LENGTH_LONG,
+                                            gravity: Toast.BOTTOM);
+                                        return;
+                                      }
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  PaymentScreen(
+                                                    user: widget.user,
+                                                    methodpay: _method,
+                                                    orderid: _orderid,
+                                                    val: _val,
+                                                  )));
+                                    },
+                                    child: Text(
+                                      'Yes, buy',
+                                      style: TextStyle(color: Colors.blue),
+                                    )),
+                                MaterialButton(
+                                    onPressed: () =>
+                                        {Navigator.of(context).pop()},
+                                    child: Text(
+                                      'No',
+                                      style: TextStyle(color: Colors.red),
+                                    ))
                               ],
                             ));
                   },
@@ -319,7 +348,7 @@ class _BuyCreditState extends State<BuyCredit> {
     );
   }
 
-   String generateOrderid() {
+  String generateOrderid() {
     var now = new DateTime.now();
     var formatter = new DateFormat('ddMMyyyy-');
     String orderid = widget.user.email.substring(1, 4) +

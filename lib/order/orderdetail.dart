@@ -276,7 +276,8 @@ class _OrderDetailState extends State<OrderDetail> {
       'foodid': widget.order.orderfood,
       'phone': widget.user.phone,
       'method': widget.order.method,
-      'total': widget.order.price
+      'total': widget.order.price,
+     
     }).then((res) {
       print(res.body);
       if (res.body == 'fail') {
