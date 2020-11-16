@@ -263,7 +263,7 @@ class _DeliverDetailState extends State<DeliverDetail> {
                                       children: [
                                         Flexible(
                                             child: Text(
-                                          'Payment: COD',
+                                          'Payment: ${widget.deliver.method}',
                                           style: TextStyle(
                                               fontSize: 18,
                                               fontWeight: FontWeight.bold),
@@ -274,7 +274,7 @@ class _DeliverDetailState extends State<DeliverDetail> {
                                               color: Colors.black),
                                         ),
                                         Expanded(
-                                            child: Text('Total price: RM14',
+                                            child: Text('Total price: RM${widget.deliver.total}',
                                                 style: TextStyle(
                                                     fontSize: 18,
                                                     fontWeight:

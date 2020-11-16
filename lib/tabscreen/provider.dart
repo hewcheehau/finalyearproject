@@ -242,7 +242,8 @@ class _ProviderScreenState extends State<ProviderScreen> {
                                                   itemdata[index]['foodrating'],
                                                   itemdata[index]['fooddate'],
                                                   itemdata[index]['foodimage'],
-                                                  itemdata[index]['description'])
+                                                  itemdata[index]['description'],
+                                                  itemdata[index]['address'])
                                             },
                                             onLongPress: _onDeleteItem,
                                             child: Column(
@@ -575,7 +576,7 @@ class _ProviderScreenState extends State<ProviderScreen> {
     }
   }
 
-  _onfoodselldetail(n, n1, n2, n3, n4, n5, n6, n7, n8, n9) {
+  _onfoodselldetail(n, n1, n2, n3, n4, n5, n6, n7, n8, n9,n10) {
     Food food = new Food(
         id: n,
         name: n1,
@@ -586,7 +587,8 @@ class _ProviderScreenState extends State<ProviderScreen> {
         rating: n6,
         regdate: n7,
         foodimage: n8,
-        description: n9);
+        description: n9,
+        faddress: n10);
     Navigator.push(
         context,
         MaterialPageRoute(

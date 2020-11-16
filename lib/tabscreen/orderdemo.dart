@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fypv1/order.dart';
+import 'package:fypv1/order/ordercomplete.dart';
 import 'package:fypv1/order/orderproceed.dart';
 import 'dart:async';
 import 'package:fypv1/user.dart';
@@ -55,188 +56,179 @@ class _OrderScreenState extends State<OrderScreen> {
       ),
       body: SafeArea(
         top: false,
-        child: RefreshIndicator(
-            key: refreshKey,
-            child: Container(
-              child: Column(
-                children: [
-                  Card(
-                    elevation: 3,
-                    color: Colors.white,
-                    child: Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Row(
+        child: Container(
+          child: Column(
+            children: [
+              Card(
+                elevation: 3,
+                color: Colors.white,
+                child: Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      Column(
                         children: [
-                          Column(
-                            children: [
-                              FlatButton(
-                                  shape: RoundedRectangleBorder(
-                                      side: BorderSide(color: Colors.grey),
-                                      borderRadius: BorderRadius.circular(20)),
-                                  color: Colors.white,
-                                  onPressed: () => {_sortOrder("Today")},
-                                  child: Text(
-                                    'Today',
-                                    style: TextStyle(
-                                        color: Colors.blueAccent,
-                                        fontSize: 18.0),
-                                  )),
-                            ],
-                          ),
-                          SizedBox(width: 12.0),
                           FlatButton(
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                                side: BorderSide(color: Colors.grey),
-                              ),
+                                  side: BorderSide(color: Colors.grey),
+                                  borderRadius: BorderRadius.circular(20)),
                               color: Colors.white,
-                              onPressed: () => {_sortOrder("Accepted")},
+                              onPressed: () => {_sortOrder("Today")},
                               child: Text(
-                                'Accepted',
+                                'Today',
                                 style: TextStyle(
-                                    color: Colors.greenAccent[700],
-                                    fontSize: 18.0),
-                              )),
-                          SizedBox(width: 12.0),
-                          FlatButton(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                                side: BorderSide(color: Colors.grey),
-                              ),
-                              color: Colors.white,
-                              onPressed: () => {_sortOrder("History")},
-                              child: Text(
-                                'History',
-                                style: TextStyle(
-                                    color: Colors.black87, fontSize: 18.0),
+                                    color: Colors.blueAccent, fontSize: 18.0),
                               )),
                         ],
                       ),
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.all(8.0),
-                    alignment: Alignment.topLeft,
-                    child: Row(
-                      children: [
-                        Text(
-                          curItem + " Order ",
-                          style: TextStyle(
-                              color: Colors.red,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(width: 5),
-                        Expanded(
-                            child: Text(
-                          curItem == "Today"
-                              ? _newOrder.toString()
-                              : _accepted.toString(),
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                        )),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                      child: Column(
-                    children: [
-                      Divider(),
-                      itemOrder == null
-                          ? Flexible(
-                              child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                FlatButton.icon(
-                                    onPressed: () => {_loadRespond()},
-                                    icon: Icon(Icons.refresh_outlined),
-                                    label: Text(titlecenter))
-                              ],
-                            ))
-                          : Expanded(
-                              child: ListView.builder(
-                                  itemCount: itemOrder.length,
-                                  itemBuilder: (context, index) {
-                                    return Container(
-                                      child: Padding(
-                                          padding: EdgeInsets.all(8.0),
-                                          child: Column(
-                                            children: [
-                                              InkWell(
-                                                onTap: () => {
-                                                  itemOrder[index]['status'] ==
-                                                          'proceed'
-                                                      ? _onOrderProceed(
-                                                          itemOrder[index]
-                                                              ['foodid'],
-                                                          itemOrder[index]
-                                                              ['foodname'],
-                                                          itemOrder[index]
-                                                              ['price'],
-                                                          itemOrder[index]
-                                                              ['foodtime'],
-                                                          itemOrder[index]
-                                                              ['foodimage'],
-                                                          itemOrder[index]
-                                                              ['quantity'],
-                                                          itemOrder[index]
-                                                              ['method'],
-                                                          itemOrder[index]
-                                                              ['orderid'],
-                                                          itemOrder[index]
-                                                                  ['total']
-                                                              .toString())
-                                                      : _onOrderDetail(
-                                                          itemOrder[index]
-                                                              ['foodid'],
-                                                          itemOrder[index]
-                                                              ['foodname'],
-                                                          itemOrder[index]
-                                                              ['price'],
-                                                          itemOrder[index]
-                                                              ['foodtime'],
-                                                          itemOrder[index]
-                                                              ['foodimage'],
-                                                          itemOrder[index]
-                                                              ['quantity'],
-                                                          itemOrder[index]
-                                                              ['method'],
-                                                          itemOrder[index]
-                                                              ['orderid'],
-                                                          itemOrder[index]
-                                                                  ['total']
-                                                              .toString())
-                                                },
-                                                child: Container(
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceAround,
-                                                    children: [
-                                                      Expanded(
-                                                          child: Text(
-                                                              "${itemOrder[index]['foodname']} - ${itemOrder[index]['quantity']}")),
-                                                      Icon(Icons
-                                                          .arrow_forward_ios_outlined)
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                              Divider(
-                                                color: Colors.black87,
-                                              )
-                                            ],
-                                          )),
-                                    );
-                                  }))
+                      SizedBox(width: 12.0),
+                      FlatButton(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                            side: BorderSide(color: Colors.grey),
+                          ),
+                          color: Colors.white,
+                          onPressed: () => {_sortOrder("Accepted")},
+                          child: Text(
+                            'Accepted',
+                            style: TextStyle(
+                                color: Colors.greenAccent[700], fontSize: 18.0),
+                          )),
+                      SizedBox(width: 12.0),
+                      FlatButton(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                            side: BorderSide(color: Colors.grey),
+                          ),
+                          color: Colors.white,
+                          onPressed: () => {_sortOrder("History")},
+                          child: Text(
+                            'History',
+                            style: TextStyle(
+                                color: Colors.black87, fontSize: 18.0),
+                          )),
                     ],
-                  ))
-                ],
+                  ),
+                ),
               ),
-            ),
-            onRefresh: () async {
-              await refreshList();
-            }),
+              Container(
+                padding: EdgeInsets.all(8.0),
+                alignment: Alignment.topLeft,
+                child: Row(
+                  children: [
+                    Text(
+                      curItem + " Order ",
+                      style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(width: 5),
+                    Expanded(
+                        child: Text(
+                      "",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    )),
+                  ],
+                ),
+              ),
+              Expanded(
+                  child: Column(
+                children: [
+                  Divider(),
+                  itemOrder == null
+                      ? Flexible(
+                          child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            FlatButton.icon(
+                                onPressed: () => {_loadRespond()},
+                                icon: Icon(Icons.refresh_outlined),
+                                label: Text(titlecenter))
+                          ],
+                        ))
+                      : Expanded(
+                          child: RefreshIndicator(
+                          key: refreshKey,
+                          onRefresh: refreshList,
+                          child: ListView.builder(
+                              itemCount: itemOrder.length,
+                              itemBuilder: (context, index) {
+                                return Container(
+                                  child: Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Column(
+                                        children: [
+                                          InkWell(
+                                            onTap: () => {
+                                              itemOrder[index]['status'] ==
+                                                      'proceed'
+                                                  ? _onOrderProceed(
+                                                      itemOrder[index]
+                                                          ['foodid'],
+                                                      itemOrder[index]
+                                                          ['foodname'],
+                                                      itemOrder[index]['price'],
+                                                      itemOrder[index]
+                                                          ['foodtime'],
+                                                      itemOrder[index]
+                                                          ['foodimage'],
+                                                      itemOrder[index]
+                                                          ['quantity'],
+                                                      itemOrder[index]
+                                                          ['method'],
+                                                      itemOrder[index]
+                                                          ['orderid'],
+                                                      itemOrder[index]['total']
+                                                          .toString())
+                                                  : _onOrderDetail(
+                                                      itemOrder[index]
+                                                          ['foodid'],
+                                                      itemOrder[index]
+                                                          ['foodname'],
+                                                      itemOrder[index]['price'],
+                                                      itemOrder[index]
+                                                          ['foodtime'],
+                                                      itemOrder[index]
+                                                          ['foodimage'],
+                                                      itemOrder[index]
+                                                          ['quantity'],
+                                                      itemOrder[index]
+                                                          ['method'],
+                                                      itemOrder[index]
+                                                          ['orderid'],
+                                                      itemOrder[index]['total']
+                                                          .toString())
+                                            },
+                                            child: Container(
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceAround,
+                                                children: [
+                                                  Expanded(
+                                                      child: Text(
+                                                          "${itemOrder[index]['foodname']} - ${itemOrder[index]['quantity']}")),
+                                                  Icon(Icons
+                                                      .arrow_forward_ios_outlined)
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                          Divider(
+                                            color: Colors.black87,
+                                          )
+                                        ],
+                                      )),
+                                );
+                              }),
+                        ))
+                ],
+              ))
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -313,12 +305,13 @@ class _OrderScreenState extends State<OrderScreen> {
 
   void _countOrder() {
     String _curStore;
-
+    
     _newOrder = itemOrder.length;
   }
 
   _onOrderDetail(itemOrder, itemOrder2, itemOrder3, itemOrder4, itemOrder5,
       itemOrder6, itemOrder7, itemOrder8, itemOrder9) {
+        print("enter order detail ");
     Order order = new Order(
         orderfood: itemOrder,
         ordername: itemOrder2,
@@ -329,7 +322,16 @@ class _OrderScreenState extends State<OrderScreen> {
         method: itemOrder7,
         orderid: itemOrder8,
         total: itemOrder9);
-
+   /* if(itemOrder['status']=='complete'){
+      print("ok complte");
+      Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    OrderComplete(order: order, user: widget.user)))
+        .then((value) => onGoBack(value));
+        return;
+    }*/
     Navigator.push(
             context,
             MaterialPageRoute(

@@ -78,7 +78,7 @@ class _FeedBackScreenState extends State<FeedBackScreen> {
                                 child: InkWell(
                                   onTap: () => {},
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Expanded(
                                         child: Container(
@@ -113,6 +113,7 @@ class _FeedBackScreenState extends State<FeedBackScreen> {
                                           ),
                                         ),
                                       ),
+                                      Text("ID: ${itemhistory[index]['orderid']}"),
                                       Text("${itemhistory[index]['foodname']}"),
                                       Text("RM ${itemhistory[index]['price']}"),
                                       Text(
@@ -143,8 +144,10 @@ class _FeedBackScreenState extends State<FeedBackScreen> {
         itemhistory = null;
         setState(() {});
       } else {
+        
         var extraction = json.decode(res.body);
         itemhistory = extraction["history"];
+        print(itemhistory.length);
         setState(() {});
       }
     }).catchError((err) {

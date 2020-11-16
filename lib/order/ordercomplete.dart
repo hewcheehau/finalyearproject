@@ -3,17 +3,17 @@ import 'package:fypv1/user.dart';
 import 'package:fypv1/order.dart';
 import 'package:http/http.dart' as http;
 
-class OrderProceed extends StatefulWidget {
+class OrderComplete extends StatefulWidget {
   final User user;
   final Order order;
 
-  OrderProceed({Key key, this.user, this.order}) : super(key: key);
+  OrderComplete({Key key, this.user, this.order}) : super(key: key);
 
   @override
-  _OrderProceedState createState() => _OrderProceedState();
+  _OrderCompleteState createState() => _OrderCompleteState();
 }
 
-class _OrderProceedState extends State<OrderProceed> {
+class _OrderCompleteState extends State<OrderComplete> {
   String server = "http://lawlietaini.com/hewdeliver";
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class _OrderProceedState extends State<OrderProceed> {
         preferredSize: Size.fromHeight(70.0),
         child: AppBar(
           backgroundColor: Colors.blueAccent,
-          title: Text("Order Accepted Detail"),
+          title: Text("Order History Detail"),
         ),
       ),
       body: Container(

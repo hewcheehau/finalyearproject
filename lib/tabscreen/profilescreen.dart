@@ -482,7 +482,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: Card(
                           elevation: 5,
                           child: MaterialButton(
-                            onPressed: ()=> {Navigator.push(context, MaterialPageRoute(builder: (context)=>CreditInfo(user: widget.user,))).then((value) => setState((){}))},
+                            onPressed: (){
+                               if (widget.user.email == 'unregistered') {
+                                Toast.show('Please register/login', context,
+                                    duration: Toast.LENGTH_LONG,
+                                    gravity: Toast.BOTTOM);
+                                return;
+                              }
+                              
+                              Navigator.push(context, MaterialPageRoute(builder: (context)=>CreditInfo(user: widget.user,))).then((value) => setState((){}));},
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
@@ -789,10 +797,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       prefs.setString('email', '');
                       prefs.setString('pass', '');
                       print('Logout');
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => LoginScreen()));
+                        Navigator.of(context)
+                                              .pushAndRemoveUntil(
+                                                  MaterialPageRoute(
+                                                      builder:
+                                                          (context) =>
+                                                              SplashScreen()),
+                                                  (Route<dynamic> route) =>
+                                                      false);
                     },
                     child: Text(
                       "Yes",

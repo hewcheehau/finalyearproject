@@ -963,8 +963,10 @@ class _CartPageState extends State<CartPage> {
       });
 
   void _proceedPayment() {
+
     print(_amountPayable);
     print(_credit);
+
     setState(() {
       showDialog(
           context: context,
@@ -1011,30 +1013,23 @@ class _CartPageState extends State<CartPage> {
   
 
   Future<void> _payusingCredit(double newamount) async {
-    print('enter pay credit');
+    print('enter pay credit: '+newamount.toString());
+    double _paytotal = _totalPrice+ double.parse(_deliveryCharge);
     _billid = uuid.v1();
-    ProgressDialog pr = new ProgressDialog(context,
-        isDismissible: true, type: ProgressDialogType.Normal);
-    pr.style(message: "Updating Cart...");
-    pr.show();
+  
     String urlPayment = server + "/php/payment_dcp1.php";
-    await http.post(urlPayment, body: {
+       http.post(urlPayment, body: {
       'userid': widget.user.email,
-      'amount': _amountPayable.toStringAsFixed(2),
+      'amount': _paytotal.toStringAsFixed(2),
       'orderid': generateOrderid(),
       'newcr': newamount.toStringAsFixed(2),
       'billid': _billid,
       'address': curaddress
     }).then((res) {
       print(res.body);
-      Future.delayed(Duration(seconds: 2)).then((value) {
-        pr.hide().whenComplete(() {
-          print(pr.isShowing());
-        });
-      });
-      setState(() {
-        
-      });
+      widget.user.credit =newamount.toStringAsFixed(2);
+      _getQue();
+      
     }).catchError((err) {
       print(err);
     });
@@ -1115,4 +1110,17 @@ class _CartPageState extends State<CartPage> {
               ],
             ));
   }
+
+  Future _getQue() async {
+    print('enter ' + _tokenOwner);
+    if (_tokenOwner!= null) {
+      var response = await http
+          .post(server + "/php/notify.php", body: {"token": _tokenOwner});
+      print('success');
+      return json.decode(response.body);
+    } else {
+      print("Token is null");
+    }
+  }
+
 }

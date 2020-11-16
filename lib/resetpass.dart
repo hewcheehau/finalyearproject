@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:toast/toast.dart';
 import 'splashscreen.dart';
+import 'login.dart';
 
 final TextEditingController _emcontroller = new TextEditingController();
 final String server = "http://lawlietaini.com/hewdeliver";
@@ -287,8 +288,8 @@ class _VerifypassState extends State<Verifypass> {
       ProgressDialog rs = ProgressDialog(context,
           type: ProgressDialogType.Normal, isDismissible: false);
       rs.style(message: 'Verifying');
-      rs.show();
-      http.post(server+"/php/verycode.php", body: {
+      
+     await http.post(server+"/php/verifycode.php", body: {
         "code": _code,
         "email": _email,
       }).then((res) {
@@ -297,23 +298,21 @@ class _VerifypassState extends State<Verifypass> {
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         _emcontroller.text = '';
         rs.style(message: 'Verification code sent.');
-        rs.show();
-
+        
+        
         if (res.body == 'code verified') {
+          
           Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (BuildContext context) => ResetPass(email: _email)));
         }
+         
 
       }).catchError((err) {
         print(err);
       });
-      Future.delayed(Duration(seconds: 2)).then((value) {
-        rs.hide().whenComplete((){
-          print(rs.isShowing());
-        });
-      });
+     
     } else {
       Toast.show('Invalid code', context,
           duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
@@ -369,7 +368,7 @@ class _ResetPassState extends State<ResetPass> {
                 child: Scaffold(
               resizeToAvoidBottomPadding: false,
               appBar: AppBar(
-                backgroundColor: Colors.tealAccent[700],
+                backgroundColor: Colors.blueAccent,
                 title: Text(
                   'Password Reset',
                   style: TextStyle(fontWeight: FontWeight.bold),
@@ -415,7 +414,7 @@ class _ResetPassState extends State<ResetPass> {
                     Padding(
                       padding: EdgeInsets.only(top: 20, left: 20),
                       child: Text(
-                        'Type your new password',
+                        'Enter your new password',
                         style: TextStyle(fontSize: 15),
                       ),
                     ),
@@ -430,7 +429,7 @@ class _ResetPassState extends State<ResetPass> {
                         
                         
                         decoration: InputDecoration(
-                          labelText: "Type your new password",
+                          labelText: "Enter your new password",
                           border: OutlineInputBorder(),
                         ),
                       ),
@@ -441,7 +440,7 @@ class _ResetPassState extends State<ResetPass> {
                     Padding(
                       padding: EdgeInsets.only(top: 20, left: 20),
                       child: Text(
-                        'Type your new password again',
+                        'Enter your new password again',
                         style: TextStyle(fontSize: 15),
                       ),
                     ),
@@ -452,20 +451,9 @@ class _ResetPassState extends State<ResetPass> {
                       padding: EdgeInsets.only(left: 20, right: 20),
                       child: TextFormField(
                         obscureText: true,
-                        onFieldSubmitted: (value) {
-                          if (value != _pwcontroller.text) {
-                            _validate = true;
-                            return 'empty';
-                          }
-                        },
-                        validator: (value) {
-                          if (value != _pwcontroller.text) {
-                            return "Passwords do not match.";
-                          } else {
-                            return null;
-                          }
-                        },
-                        autovalidate: _validate,
+                        
+                        
+                        
                         decoration: InputDecoration(
                           labelText: "Enter your new password again",
                           border: OutlineInputBorder(),
@@ -481,7 +469,7 @@ class _ResetPassState extends State<ResetPass> {
                           alignment: Alignment.centerLeft,
                           child: RaisedButton(
                             padding: EdgeInsets.fromLTRB(30, 0, 30, 0),
-                            color: Colors.greenAccent[700],
+                            color: Colors.blueAccent,
                             onPressed: _pressButton,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20.0),
@@ -532,7 +520,7 @@ class _ResetPassState extends State<ResetPass> {
                                                   MaterialPageRoute(
                                                       builder:
                                                           (context) =>
-                                                              SplashScreen()),
+                                                              LoginScreen()),
                                                   (Route<dynamic> route) =>
                                                       false);
                 }

@@ -179,6 +179,7 @@ class _BuyerOrderScreenState extends State<BuyerOrderScreen> {
                                                   ),
                                                 )
                                               : Expanded(
+                                                flex: 2,
                                                   child: Container(
                                                       child: Column(
                                                   children: [
@@ -189,6 +190,7 @@ class _BuyerOrderScreenState extends State<BuyerOrderScreen> {
                                                                 ['status'] ==
                                                             "rejected"
                                                         ? Flexible(
+                                                          
                                                             child: Column(
                                                               children: [
                                                                 Icon(
@@ -263,6 +265,7 @@ class _BuyerOrderScreenState extends State<BuyerOrderScreen> {
                                                             ),
                                                           )
                                                         : Expanded(
+                                                          
                                                             child: itemraider ==
                                                                     null
                                                                 ? Container(
@@ -651,7 +654,7 @@ class _BuyerOrderScreenState extends State<BuyerOrderScreen> {
                                 }
                                 if(status=="accepted"){
 
-                                    Toast.show('Not allow, please load', context,
+                                    Toast.show('Not allow', context,
                                       duration: Toast.LENGTH_LONG,
                                       gravity: Toast.BOTTOM);
                                       _loadOrder();
@@ -875,13 +878,14 @@ class _RateScreenState extends State<RateScreen> {
                     color: Colors.blue[700],
                     onPressed: () {
                       ProgressDialog pr = new ProgressDialog(context,isDismissible: true, type: ProgressDialogType.Normal);
-                      pr.style(message:"Updating...");
-                      pr.show();
+                      
                       if (_rating == 0) {
                         Toast.show('Please rate', context,
                             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
                         return;
                       }
+                      pr.style(message:"Updating...");
+                      pr.show();
                       String rating = _rating.toString();
                       print("your rate is " + rating);
                       http.post(
@@ -933,7 +937,7 @@ class _RateScreenState extends State<RateScreen> {
   }
 
   Future<bool> _goBackPage() async {
-    return await showDialog(
+    return showDialog(
             context: context,
             builder: (BuildContext context) => AlertDialog(
                   title: Align(
@@ -942,7 +946,14 @@ class _RateScreenState extends State<RateScreen> {
                   content: Text('Are you want to back without rating food?'),
                   actions: [
                     MaterialButton(
-                      onPressed: () => {Navigator.of(context).pop(true)},
+                      onPressed: () => { Navigator.of(context)
+                                              .pushAndRemoveUntil(
+                                                  MaterialPageRoute(
+                                                      builder:
+                                                          (context) =>
+                                                              MainScreen(user: widget.user,)),
+                                                  (Route<dynamic> route) =>
+                                                      false)},
                       child: Text('Yes'),
                     ),
                     MaterialButton(

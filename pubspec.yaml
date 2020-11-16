@@ -44,7 +44,7 @@ dependencies:
   url_launcher: ^5.7.2
   flutter_webview_plugin: ^0.3.11
   timeline_tile: ^1.0.0
-  
+ 
   
  
 
@@ -58,6 +58,13 @@ dev_dependencies:
     sdk: flutter
     
   webview_flutter: ^1.0.0
+  flutter_launcher_icons: "^0.8.0"
+
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "asset/images/icon.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

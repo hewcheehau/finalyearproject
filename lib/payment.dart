@@ -1,5 +1,5 @@
 import 'dart:ffi';
-
+import 'creditinfo.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -54,7 +54,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     super.initState();
     userPhone = widget.user.phone.toString().substring(1);
     print('userphone is ' + userPhone);
-  _bill = uuid.v1();
+    _bill = uuid.v1();
     //  _loadRespond();
   }
 
@@ -67,6 +67,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           title: Text('PAYMENT'),
           centerTitle: true,
           backgroundColor: Colors.blueAccent,
+          leading: IconButton(icon: Icon(Icons.backspace_outlined),onPressed: _backToPreviousPage,),
         ),
         body: Center(
           child: Container(
@@ -104,7 +105,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             style: TextStyle(fontSize: 25),
                           ),
                           SizedBox(height: 20),
-                         Padding(
+                          Padding(
                             padding: const EdgeInsets.all(11.0),
                             child: Container(
                               child: Table(
@@ -245,7 +246,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   void _loadRespond() async {
-  
     http.post(server + "/php/update_cod.php", body: {
       'email': widget.user.email,
       'amount': widget.val,
@@ -286,7 +286,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     print('onbackpress payment');
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String urlgetuser = "http://lawlietaini.com/hewdeliver/php/get_user.php";
-
+    
     http.post(urlgetuser, body: {
       "email": widget.user.email,
       'password': prefs.get('pass').toString()
@@ -305,13 +305,17 @@ class _PaymentScreenState extends State<PaymentScreen> {
             datereg: dres[6],
             address: dres[7],
             token: dres[8]);
-        Navigator.pop(context);
-        Navigator.push(
+            widget.user.credit = dres[5];
+            
+       Navigator.pop(context);
+
+      /*  Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => MainScreen(
+                builder: (context) => CreditInfo(
                       user: updateuser,
-                    )));
+                    )));*/
+                // Navigator.popUntil(context, (route) => false);
       }
     }).catchError((err) {
       print(err);
@@ -320,8 +324,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   void _updatepayment() async {
-    ProgressDialog pr = new ProgressDialog(context,isDismissible: true,type: ProgressDialogType.Normal);
-    pr.style(message:"Updating payment...");
+    ProgressDialog pr = new ProgressDialog(context,
+        isDismissible: true, type: ProgressDialogType.Normal);
+    pr.style(message: "Updating payment...");
     pr.show();
     http.post(server + "/php/payment_cod.php", body: {
       'email': widget.user.email,
@@ -331,29 +336,26 @@ class _PaymentScreenState extends State<PaymentScreen> {
       'name': widget.user.name,
       'mobile': widget.user.phone,
       'method': widget.methodpay,
-      'address':widget.address
+      'address': widget.address
     }).then((res) {
       if (res.body == 'payment fail') {
         print('failed pay:' + res.body);
-       
       } else {
-         print('order added');
-       _showResult();
+        print('order added');
+        _showResult();
       }
       Future.delayed(Duration(seconds: 2)).then((value) {
-        pr.hide().whenComplete(() => {
-          print(pr.isShowing())
-        });
+        pr.hide().whenComplete(() => {print(pr.isShowing())});
       });
     }).catchError((err) {
       print(err);
     });
   }
 
-   Future<Void>_showResult() async {
+  Future<Void> _showResult() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     pref.setInt('payfood', 1);
-      return await  showDialog(
+    return await showDialog(
         context: context,
         builder: (context) => AlertDialog(
               title: Text('Ordered successful.'),
@@ -364,7 +366,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 MaterialButton(
                     child: Text('Ok'),
                     onPressed: () {
-                      Navigator.of(context).pop(false);
+                      Navigator.of(context).pop();
                       Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(

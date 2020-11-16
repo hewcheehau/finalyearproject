@@ -48,8 +48,8 @@ class _MainPageState extends State<MainPage> {
   void initState() {
     super.initState();
     refreshKey = GlobalKey<RefreshIndicatorState>();
-    _loadDate();
-    _loadCart();
+    this._loadDate();
+    this._loadCart();
     //init();
 
     if (widget.user.type == 'Food Provider') {
@@ -103,7 +103,7 @@ class _MainPageState extends State<MainPage> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => CartPage(user: widget.user)));
+                          builder: (context) => CartPage(user: widget.user))).then((value) => setState((){_loadCart();}));
                 }),
           )
         ],
@@ -234,7 +234,7 @@ class _MainPageState extends State<MainPage> {
                             Column(
                               children: <Widget>[
                                 FlatButton(
-                                    onPressed: () => _sortFood("Recent"),
+                                    onPressed: () => _sortFood("Shop"),
                                     child: Column(
                                       children: <Widget>[
                                         Icon(
@@ -373,7 +373,8 @@ class _MainPageState extends State<MainPage> {
                                               itemdata[index]['foodrating'],
                                               itemdata[index]['foodtime'],
                                               itemdata[index]['foodimage'],
-                                              itemdata[index]['foodowner']),
+                                              itemdata[index]['foodowner'],
+                                              itemdata[index]['address']),
                                           child: Container(
                                             height: screenHeight / 4.5,
                                             width: screenWidth / 1.0,
@@ -649,7 +650,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   _onFoodDetail(itemdata, itemdata2, itemdata3, itemdata4, itemdata5, itemdata6,
-      itemdata7, itemdata8, itemdata9, itemdata10) {
+      itemdata7, itemdata8, itemdata9, itemdata10,itemdata11) {
     Food food = new Food(
         id: itemdata,
         name: itemdata2,
@@ -660,7 +661,8 @@ class _MainPageState extends State<MainPage> {
         rating: itemdata7,
         regdate: itemdata8,
         foodimage: itemdata9,
-        fowner: itemdata10);
+        fowner: itemdata10,
+        faddress: itemdata11);
     Navigator.push(
         context,
         MaterialPageRoute(

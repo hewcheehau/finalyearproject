@@ -30,12 +30,14 @@ class _NewFoodState extends State<NewFood> {
   final _focus2 = FocusNode();
   final _focus3 = FocusNode();
   final _focus4 = FocusNode();
+  final _focus5 = FocusNode();
 
   TextEditingController fname = new TextEditingController();
   TextEditingController ftype = new TextEditingController();
   TextEditingController faddress = new TextEditingController();
   TextEditingController fprice = new TextEditingController();
   TextEditingController fquantity = new TextEditingController();
+  TextEditingController fshop = new TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -219,6 +221,38 @@ class _NewFoodState extends State<NewFood> {
                                   ),
                                 ))
                               ]),
+                                 TableRow(children: [
+                                TableCell(
+                                    child: Container(
+                                  alignment: Alignment.centerLeft,
+                                  margin: EdgeInsets.only(top: 10, bottom: 10),
+                                  height: 30,
+                                  child: Text('Food Shop Name'),
+                                )),
+                                TableCell(
+                                    child: Container(
+                                  margin: EdgeInsets.fromLTRB(5, 10, 5, 10),
+                                  height: 30,
+                                  child: TextFormField(
+                                    controller: fshop,
+                                    focusNode: _focus3,
+                                    keyboardType: TextInputType.text,
+                                    textInputAction: TextInputAction.done,
+                                    onFieldSubmitted: (value) {
+                                      FocusScope.of(context)
+                                          .requestFocus(_focus4);
+                                    },
+                                    decoration: new InputDecoration(
+                                        hintText: 'etc: Shop name',
+                                        contentPadding:
+                                            const EdgeInsets.all(5.0),
+                                        border: new OutlineInputBorder(
+                                            borderRadius:
+                                                new BorderRadius.circular(5.0),
+                                            borderSide: new BorderSide())),
+                                  ),
+                                ))
+                              ]),
                               TableRow(children: [
                                 TableCell(
                                     child: Container(
@@ -233,12 +267,12 @@ class _NewFoodState extends State<NewFood> {
                                   height: 30,
                                   child: TextFormField(
                                     controller: faddress,
-                                    focusNode: _focus3,
+                                    focusNode: _focus4,
                                     keyboardType: TextInputType.text,
                                     textInputAction: TextInputAction.done,
                                     onFieldSubmitted: (value) {
                                       FocusScope.of(context)
-                                          .requestFocus(_focus4);
+                                          .requestFocus(_focus5);
                                     },
                                     decoration: new InputDecoration(
                                         hintText: 'etc: Kachi Mall',
@@ -258,7 +292,7 @@ class _NewFoodState extends State<NewFood> {
                               minWidth: screenWidth / 1.5,
                               height: 50,
                               color: Colors.blueAccent,
-                              focusNode: _focus4,
+                              focusNode: _focus5,
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(5.0)),
                               onPressed: _addfoodproduct,
@@ -333,16 +367,21 @@ class _NewFoodState extends State<NewFood> {
     CircularProgressIndicator(
       valueColor: AlwaysStoppedAnimation<Color>(Colors.blueAccent),
     );
-    if(fname.text!=null && faddress.text!=null && fquantity.text!=null && fprice.text!=null){
+    if(_image==null){
+      Toast.show("Empty picture", context,duration:Toast.LENGTH_SHORT,gravity:Toast.BOTTOM);
+      return;
+    }
+    if(fname.text!=null && faddress.text!=null && fquantity.text!=null && fprice.text!=null &&fshop.text!=null){
     String base64Image = base64Encode(_image.readAsBytesSync());
     http.post(server + "/php/add_food.php", body: {
       "encoded_string": base64Image,
       "email": widget.user.email,
       "fname": fname.text,
-      "fshop": faddress.text,
+      "fshop": fshop.text,
       "ftype": ftype.text,
       "price": fprice.text,
       "quantity": fquantity.text,
+      "faddress": faddress.text
     }).then((res) {
       print(res.statusCode);
       if (res.body == 'success') {
@@ -352,10 +391,11 @@ class _NewFoodState extends State<NewFood> {
         fprice.text = "";
         fquantity.text = "";
         _image = null;
+        fshop.text = "";
 
         _showSuccess();
       } else {
-        Toast.show('Failed', context,
+        Toast.show('Failed, incomplete form', context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       }
     }).catchError((err) {

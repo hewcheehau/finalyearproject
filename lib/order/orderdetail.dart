@@ -6,8 +6,10 @@ import 'package:toast/toast.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:fypv1/main.dart';
+import 'dart:convert';
 
 final double delivercharge = 1.5;
+String _custToken;
 
 class OrderDetail extends StatefulWidget {
   final Order order;
@@ -277,7 +279,6 @@ class _OrderDetailState extends State<OrderDetail> {
       'phone': widget.user.phone,
       'method': widget.order.method,
       'total': widget.order.price,
-     
     }).then((res) {
       print(res.body);
       if (res.body == 'fail') {
@@ -287,6 +288,7 @@ class _OrderDetailState extends State<OrderDetail> {
         Future.delayed(Duration(seconds: 2)).then((value) {
           pr.hide().whenComplete(() {
             print(pr.isShowing());
+            _getQue();
             _showSuccess();
           });
         });
@@ -310,14 +312,48 @@ class _OrderDetailState extends State<OrderDetail> {
     setState(() {});
   }
 
-  void _loadOrder() {}
+  void _loadOrder() {
+    http.post(server + "/php/get_custtoken.php", body: {
+      'orderid': widget.order.orderid,
+    }).then((res) {
+      var string = res.body;
+      List dres = string.split(",");
 
-  void _showSuccess()async {
+      print(dres);
+      Toast.show(dres[0], context,
+          duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+          if(dres[0]=='success'){
+
+            _custToken = dres[1];
+            setState(() {
+              
+            });
+          }else{
+            print('failed to get');
+          }
+    }).catchError((err) {
+      print(err);
+    });
+  }
+
+   Future _getQue() async {
+    print('enter ' + _custToken);
+    if (_custToken!= null) {
+      var response = await http
+          .post(server + "/php/notify_order.php", body: {"token": _custToken});
+      print('success');
+      return json.decode(response.body);
+    } else {
+      print("Token is null");
+    }
+  }
+
+  void _showSuccess() async {
     print('enter success');
-   await showDialog(
+    await showDialog(
         context: context,
         builder: (BuildContext context) {
-         return CupertinoAlertDialog(
+          return CupertinoAlertDialog(
             title: const Text('Accepted successfully'),
             content: Icon(
               Icons.check_circle_outline,

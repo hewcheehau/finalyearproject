@@ -27,21 +27,24 @@ class _FoodSellDetailState extends State<FoodSellDetail> {
   final _focus2 = FocusNode();
   final _focus3 = FocusNode();
   final _focus4 = FocusNode();
+  final _focus5 = FocusNode();
 
   TextEditingController fname = new TextEditingController();
   TextEditingController ftype = new TextEditingController();
   TextEditingController faddress = new TextEditingController();
   TextEditingController fprice = new TextEditingController();
   TextEditingController fquantity = new TextEditingController();
+  TextEditingController fshop =new TextEditingController();
 
   @override
   void initState() {
     super.initState();
     fname = new TextEditingController(text: widget.food.name);
     ftype = new TextEditingController(text: widget.food.description);
-    faddress = new TextEditingController(text: widget.food.shopname);
+    faddress = new TextEditingController(text: widget.food.faddress);
     fprice = new TextEditingController(text: widget.food.price);
     fquantity = new TextEditingController(text: widget.food.quantity);
+    fshop = new TextEditingController(text: widget.food.shopname);
   }
 
   @override
@@ -242,6 +245,37 @@ class _FoodSellDetailState extends State<FoodSellDetail> {
                                     top: 10, bottom: 10, left: 8.0),
                                 alignment: Alignment.centerLeft,
                                 height: 30,
+                                child: Text('Food Shop Name'),
+                              )),
+                              TableCell(
+                                  child: Container(
+                                margin: EdgeInsets.fromLTRB(5, 10, 5, 10),
+                                height: 30,
+                                child: TextFormField(
+                                  controller: fshop,
+                                  focusNode: _focus3,
+                                  keyboardType: TextInputType.text,
+                                  textInputAction: TextInputAction.next,
+                                  onFieldSubmitted: (value) {
+                                    FocusScope.of(context)
+                                        .requestFocus(_focus4);
+                                  },
+                                  decoration: new InputDecoration(
+                                      contentPadding: const EdgeInsets.all(5.0),
+                                      border: new OutlineInputBorder(
+                                          borderRadius:
+                                              new BorderRadius.circular(5.0),
+                                          borderSide: new BorderSide())),
+                                ),
+                              ))
+                            ]),
+                              TableRow(children: [
+                              TableCell(
+                                  child: Container(
+                                margin: EdgeInsets.only(
+                                    top: 10, bottom: 10, left: 8.0),
+                                alignment: Alignment.centerLeft,
+                                height: 30,
                                 child: Text('Food Shop Address'),
                               )),
                               TableCell(
@@ -250,12 +284,12 @@ class _FoodSellDetailState extends State<FoodSellDetail> {
                                 height: 30,
                                 child: TextFormField(
                                   controller: faddress,
-                                  focusNode: _focus3,
+                                  focusNode: _focus4,
                                   keyboardType: TextInputType.text,
                                   textInputAction: TextInputAction.next,
                                   onFieldSubmitted: (value) {
                                     FocusScope.of(context)
-                                        .requestFocus(_focus4);
+                                        .requestFocus(_focus5);
                                   },
                                   decoration: new InputDecoration(
                                       contentPadding: const EdgeInsets.all(5.0),
@@ -359,7 +393,7 @@ class _FoodSellDetailState extends State<FoodSellDetail> {
                   alignment: Alignment.center,
                   child: FlatButton(
                     color: Colors.blueAccent,
-                    child: Text('Ok', textAlign: TextAlign.center),
+                    child: Text('Ok', textAlign: TextAlign.center,style: TextStyle(color:Colors.white),),
                     onPressed: () {
                       Navigator.pushAndRemoveUntil(
                           context,
@@ -386,7 +420,8 @@ class _FoodSellDetailState extends State<FoodSellDetail> {
     String price = fprice.text;
     String quantity = fquantity.text;
     String address = faddress.text;
-    if (name == null || price == null || quantity == null || address == null) {
+    String shopname = fshop.text;
+    if (name == null || price == null || quantity == null || address == null||shopname == null) {
       Toast.show('Check your format', context,
           duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
     }
@@ -398,7 +433,8 @@ class _FoodSellDetailState extends State<FoodSellDetail> {
       'quantity': quantity,
       'price': price,
       'address': address,
-      'id': widget.food.id
+      'id': widget.food.id,
+      'shop':shopname
     }).then((res) {
       if (res.body == 'nodata') {
         Toast.show('fail update', context,

@@ -190,6 +190,7 @@ class _CreditInfoState extends State<CreditInfo> {
         body: {'email': widget.user.email}).then((res) {
       if (res.body == 'nodata') {
         itemcredit = null;
+        print(res.body);
         titlecenter = "No record";
         setState(() {});
       } else {
@@ -312,7 +313,9 @@ class _BuyCreditState extends State<BuyCredit> {
                                             gravity: Toast.BOTTOM);
                                         return;
                                       }
-                                      Navigator.push(
+                                      _amount.text = "";
+                                      Navigator.of(context).pop();
+                                      Navigator.pushReplacement(
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
@@ -321,7 +324,7 @@ class _BuyCreditState extends State<BuyCredit> {
                                                     methodpay: _method,
                                                     orderid: _orderid,
                                                     val: _val,
-                                                  )));
+                                                  ))).then((value) => setState((){}));
                                     },
                                     child: Text(
                                       'Yes, buy',

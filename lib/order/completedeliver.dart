@@ -40,6 +40,7 @@ class _CompleteDeliverScreenState extends State<CompleteDeliverScreen> {
           title: Text('Delivery detail'),
           centerTitle: true,
           backgroundColor: Colors.blueAccent,
+          
         ),
         body: Center(
           child: Column(
@@ -184,12 +185,14 @@ class _CompleteDeliverScreenState extends State<CompleteDeliverScreen> {
 
   _onCompleteFood() {
     String _isfinish = 'reach';
+    String _totalearn = "1.50";
     http.post(server + "/php/update_deliver.php", body: {
       'email': widget.user.email,
       'note': _note.text,
       'current': _isfinish,
       'orderid': widget.deliver.orderid,
-      'taskid': widget.deliver.taskid
+      'taskid': widget.deliver.taskid,
+      'earn' : _totalearn
     }).then((res) {
       if (res.body == 'success') {
         _showSuccess();
