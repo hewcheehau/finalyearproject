@@ -56,6 +56,7 @@ class _CompleteDeliverScreenState extends State<CompleteDeliverScreen> {
                     ),
                   )),
               SizedBox(height: 10),
+         //     RaisedButton(onPressed: ()=>{},child: Text("Notify customer you have reached."),),
               GestureDetector(
                 onTap: () => {_choose()},
                 child: Container(

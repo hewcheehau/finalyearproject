@@ -108,7 +108,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 child: Container(
                                     padding: EdgeInsets.only(right: 15, top: 90),
                                     child: Image.asset(
-                                      'asset/images/logofyp2.png',
+                                      'asset/images/logofyp5.png',
                                       width: 150,
                                     )))
                           ])),

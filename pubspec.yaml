@@ -95,6 +95,7 @@ flutter:
     - asset/images/pickup.png
     - asset/images/delivering.png
     - asset/images/check.png
+    - asset/images/logofyp5.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

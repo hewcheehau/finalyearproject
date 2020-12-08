@@ -802,7 +802,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   MaterialPageRoute(
                                                       builder:
                                                           (context) =>
-                                                              SplashScreen()),
+                                                              LoginScreen()),
                                                   (Route<dynamic> route) =>
                                                       false);
                     },

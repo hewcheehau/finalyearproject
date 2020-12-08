@@ -234,7 +234,7 @@ class _MainPageState extends State<MainPage> {
                             Column(
                               children: <Widget>[
                                 FlatButton(
-                                    onPressed: () => _sortFood("Shop"),
+                                    onPressed: () => _sortFood("Price"),
                                     child: Column(
                                       children: <Widget>[
                                         Icon(
